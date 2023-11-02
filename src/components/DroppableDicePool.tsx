@@ -55,7 +55,7 @@ export default function DroppableDicePool({
             moreClasses="mx-auto mb-2"
           />
         )}
-        {dice.map((die, i) =>
+        {dice.map((die) =>
           dicePool === DicePool.Stash && die.id === HOPE_DIE_ID ? null : (
             <DraggableDie
               die={die}

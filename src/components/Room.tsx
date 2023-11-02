@@ -18,7 +18,7 @@ export default function Room() {
   const { username, isGm } = useUser()
   const { room } = useParams()
 
-  const [isAnimated, setIsAnimated] = useState(true)
+  const [isAnimated] = useState(true)
   const [users, setUsers] = useState<User[]>([])
   const [dicePools, setDicePools] = useState<{ [key in DicePool]: Die[] }>({
     [DicePool.Player]: getInitialDice(),
@@ -79,7 +79,7 @@ export default function Room() {
         setDraggingDice((prevState) => [...prevState, { dieId, username }])
       })
 
-      socket.on("dragEnded", ({ prevDicePool, newDicePool, username, dieId }) => {
+      socket.on("dragEnded", ({ prevDicePool, newDicePool, dieId }) => {
         setDraggingDice((prevState) => {
           const newState = [...prevState]
           const index = newState.findIndex((entry) => entry.dieId === dieId)
