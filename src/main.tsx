@@ -20,7 +20,7 @@ const router = createBrowserRouter([
   },
 ])
 
-const slideInAnimation = `0% {transform: translate3d(0,-200%,0) scale(.6); opacity:.5;}
+const slideInAnimation = `0% {transform: translate3d(0,200%,0) scale(.6); opacity:.5;}
 100% {transform: translate3d(0,0,0) scale(1); opacity:1;}`
 // const fadeInAnimation = `0%{opacity:0;} 100%{opacity:1;}`
 const fadeOutAnimation = `0%{opacity:1;} 100%{opacity:0;}`
@@ -29,8 +29,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <UserProvider>
     <RouterProvider router={router} />
     <Toaster
+      position="bottom-right"
       toastOptions={{
-        className: "!bg-[rgba(60,60,60,0.7)] !text-white !p-4 !max-w-full",
+        className: "!bg-[rgba(60,60,60)] !text-white !p-4 !max-w-full",
         duration: 2000,
       }}
     >

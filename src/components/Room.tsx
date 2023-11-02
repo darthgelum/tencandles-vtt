@@ -168,6 +168,9 @@ export default function Room() {
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <p className="absolute top-1 w-full text-center text-xs text-lightgrey">
+        To invite players to join this room, send them this page’s URL.
+      </p>
       {/* users */}
       <div className="absolute w-full h-full">
         {users.map((user, i) => (
