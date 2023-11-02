@@ -1,18 +1,15 @@
 import Particles from "react-particles"
 
-export default function SmokeParticles({ candleIndex, particlesLoaded }) {
+export default function SmokeParticles({ candleIndex }) {
   return (
     <Particles
       className="absolute -top-[150px] -left-[136px] w-[400px] h-[300px] pointer-events-none"
       id={`smoke-${candleIndex}`}
-      // init={particlesInit}
-      loaded={particlesLoaded}
       options={{
         fpsLimit: 60,
         fullScreen: false,
-        // interactivity: { modes},
         particles: {
-          color: { value: "#707070" },
+          color: { value: "#a1a1a1" },
           life: { count: 1, duration: { value: { min: 1, max: 3 } } },
           move: {
             enable: true,

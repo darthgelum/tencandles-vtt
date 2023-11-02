@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "PixelMix";
+  src: url("../public/fonts/pixelmix.ttf");
+}
+
+body {
+  @apply overflow-hidden;
+}
+
+#root {
+  @apply bg-black font-pixel text-white h-screen w-screen flex justify-center items-center overflow-hidden;
+}

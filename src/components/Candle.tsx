@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { useCallback, useState } from "react"
-import type { Container, Engine } from "tsparticles-engine"
+import type { Engine } from "tsparticles-engine"
 import { loadSlim } from "tsparticles-slim"
 import { loadEmittersPlugin } from "tsparticles-plugin-emitters"
 
@@ -20,16 +20,12 @@ const positionClasses = [
   "top-[10%] left-[20%]",
 ]
 
-export default function Candle({ index }) {
+export default function Candle({ index, isAnimated }) {
   const [isLit, setIsLit] = useState(true)
 
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadEmittersPlugin(engine, false)
     await loadSlim(engine, false)
-  }, [])
-
-  const particlesLoaded = useCallback(async (container: Container | undefined) => {
-    // await console.log(container)
   }, [])
 
   return (
@@ -38,13 +34,26 @@ export default function Candle({ index }) {
       className={clsx(positionClasses[index], "absolute w-[128px]")}
     >
       <img src="/candle.png" className="absolute inset-0 w-full" style={{ imageRendering: "pixelated" }} />
-      {isLit ? (
-        <FlameParticles candleIndex={index} particlesInit={particlesInit} particlesLoaded={particlesLoaded} />
+      {isAnimated ? (
+        <>
+          {isLit ? (
+            <>
+              <div
+                className=" w-[200px] h-[200px] absolute -top-[105px] -left-[36px]"
+                style={{
+                  background: "radial-gradient(circle at center, rgba(255, 207, 74, 0.5) 0%, rgba(255, 207, 74, 0) 60%",
+                }}
+              />
+              <FlameParticles candleIndex={index} particlesInit={particlesInit} />
+              <div className="-top-[1px] left-[61px] w-[6px] h-[6px] absolute bg-yellow" />
+            </>
+          ) : (
+            <SmokeParticles candleIndex={index} />
+          )}
+        </>
       ) : (
-        <SmokeParticles candleIndex={index} particlesLoaded={particlesLoaded} />
+        <>{isLit && <div className="absolute left-12 bottom-0 w-8 h-12 bg-[orange]" />}</>
       )}
-      {/* <FlameParticles candleIndex={index} particlesInit={particlesInit} particlesLoaded={particlesLoaded} />
-              <SmokeParticles candleIndex={index} particlesInit={particlesInit} particlesLoaded={particlesLoaded} /> */}
     </button>
   )
 }

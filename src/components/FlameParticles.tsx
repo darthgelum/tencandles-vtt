@@ -1,16 +1,14 @@
 import Particles from "react-particles"
 
-export default function FlameParticles({ candleIndex, particlesInit, particlesLoaded }) {
+export default function FlameParticles({ candleIndex, particlesInit }) {
   return (
     <Particles
-      className="absolute -top-[150px] -left-[136px] w-[400px] h-[300px] pointer-events-none"
+      className="absolute -top-[150px] -left-[135px] w-[400px] h-[300px] pointer-events-none"
       id={`flame-${candleIndex}`}
       init={particlesInit}
-      loaded={particlesLoaded}
       options={{
         fpsLimit: 60,
         fullScreen: false,
-        // interactivity: { modes},
         particles: {
           color: {
             animation: { h: { enable: true, speed: -100 } },
@@ -19,7 +17,7 @@ export default function FlameParticles({ candleIndex, particlesInit, particlesLo
           move: {
             enable: true,
             speed: 2,
-            angle: { value: { min: 0, max: 50 }, offset: 0 },
+            angle: { value: { min: 0, max: 20 }, offset: 0 },
           },
           opacity: {
             animation: {
@@ -47,8 +45,8 @@ export default function FlameParticles({ candleIndex, particlesInit, particlesLo
             delay: 0.1,
           },
           size: {
-            width: 20,
-            height: 20,
+            width: 8,
+            height: 10,
             mode: "precise",
           },
           spawnColor: {
