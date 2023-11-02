@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ToastBar, Toaster } from "react-hot-toast"
-import { styled, keyframes } from "goober"
+import { keyframes } from "goober"
 import "globals.css"
 import Lobby from "components/Lobby"
 import ErrorPage from "components/ErrorPage"
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
 
 const slideInAnimation = `0% {transform: translate3d(0,-200%,0) scale(.6); opacity:.5;}
 100% {transform: translate3d(0,0,0) scale(1); opacity:1;}`
-const fadeInAnimation = `0%{opacity:0;} 100%{opacity:1;}`
+// const fadeInAnimation = `0%{opacity:0;} 100%{opacity:1;}`
 const fadeOutAnimation = `0%{opacity:1;} 100%{opacity:0;}`
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

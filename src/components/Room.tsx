@@ -26,7 +26,7 @@ export default function Room() {
     [DicePool.Stash]: [{ id: HOPE_DIE_ID, num: 1 }],
   })
   const [draggingDice, setDraggingDice] = useState<{ dieId: number; username: string }[]>([])
-  console.log(candles)
+
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
       const newState = { ...prevState }
@@ -73,15 +73,13 @@ export default function Room() {
       setUsers(reorderedUsers)
 
       if (isGm) {
-        console.log("gm passInitialDicePoolsAndCandles")
-
         socket.emit("passInitialDicePoolsAndCandles", { room, dicePools, candles })
       }
+
       if (toastText) toast(toastText)
     })
 
     socket.on("passedInitialDicePoolsAndCandles", ({ dicePools: _dicePools, candles: _candles }) => {
-      console.log("passedInitialDicePoolsAndCandles", _dicePools)
       setDicePools(_dicePools)
       setCandles(_candles)
     })
