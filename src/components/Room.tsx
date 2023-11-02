@@ -187,7 +187,7 @@ export default function Room() {
         }}
       />
       <div
-        className="bg-[url('/public/wood.png')] bg-[length:250px] absolute w-11/12 h-5/6 rounded-[100%]"
+        className="bg-[url('/wood.png')] bg-[length:250px] absolute w-11/12 h-5/6 rounded-[100%]"
         style={{ imageRendering: "pixelated" }}
       />
       {/* candles */}

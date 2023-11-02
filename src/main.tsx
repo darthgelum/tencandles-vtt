@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <RouterProvider router={router} />
     <Toaster
       toastOptions={{
-        className: "bg-[rgba(60,60,60,0.7)] text-white p-4 max-w-full",
+        className: "!bg-[rgba(60,60,60,0.7)] !text-white !p-4 !max-w-full",
         duration: 2000,
       }}
     >
