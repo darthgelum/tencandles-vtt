@@ -1,6 +1,7 @@
+import { memo } from "react"
 import Particles from "react-particles"
 
-export default function SmokeParticles({ candleIndex }) {
+const SmokeParticles = memo(function SmokeParticles({ candleIndex }: { candleIndex: number }) {
   return (
     <Particles
       className="absolute -top-[150px] -left-[136px] w-[400px] h-[300px] pointer-events-none"
@@ -56,4 +57,6 @@ export default function SmokeParticles({ candleIndex }) {
       }}
     />
   )
-}
+})
+
+export default SmokeParticles

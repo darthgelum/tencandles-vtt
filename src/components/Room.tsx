@@ -18,15 +18,15 @@ export default function Room() {
   const { username, isGm } = useUser()
   const { room } = useParams()
 
-  const [isAnimated] = useState(true)
   const [users, setUsers] = useState<User[]>([])
+  const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
   const [dicePools, setDicePools] = useState<{ [key in DicePool]: Die[] }>({
     [DicePool.Player]: getInitialDice(),
     [DicePool.GM]: [],
     [DicePool.Stash]: [{ id: HOPE_DIE_ID, num: 1 }],
   })
   const [draggingDice, setDraggingDice] = useState<{ dieId: number; username: string }[]>([])
-
+  console.log(candles)
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
       const newState = { ...prevState }
@@ -49,57 +49,85 @@ export default function Room() {
       socket.on("connect", () => {
         socket.emit("userJoined", { username, room, isGm })
       })
-
-      socket.on("usersUpdated", (updatedUsers) => {
-        // reorder users so that this user is first in the array
-        const reorderedUsers: User[] = []
-        const userIndex = updatedUsers.findIndex((user) => user.name === username)
-
-        for (
-          let index = userIndex, reorderedIndex = 0;
-          reorderedIndex < updatedUsers.length;
-          index++, reorderedIndex++
-        ) {
-          if (index === updatedUsers.length) index = 0
-          reorderedUsers[reorderedIndex] = updatedUsers[index]
-        }
-        setUsers(reorderedUsers)
-      })
-
-      socket.on("rolled", ({ dicePool, dice, username }) => {
-        setDicePools((prevState) => {
-          const newState = { ...prevState }
-          dice.forEach((d, i) => (newState[dicePool][i].num = d))
-          return newState
-        })
-        toast(`${username} rolled the ${dicePool}`)
-      })
-
-      socket.on("dragStarted", ({ username, dieId }) => {
-        setDraggingDice((prevState) => [...prevState, { dieId, username }])
-      })
-
-      socket.on("dragEnded", ({ prevDicePool, newDicePool, dieId }) => {
-        setDraggingDice((prevState) => {
-          const newState = [...prevState]
-          const index = newState.findIndex((entry) => entry.dieId === dieId)
-          if (index > -1) {
-            newState.splice(index, 1)
-          }
-          return newState
-        })
-        transferDieToNewPool(dieId, prevDicePool, newDicePool)
-      })
     }
-
     if (username) initSocket()
 
     return () => {
       if (socket) {
+        socket.removeAllListeners()
         socket.disconnect()
       }
     }
-  }, [isGm, room, transferDieToNewPool, username])
+  }, [isGm, room, username])
+
+  useEffect(() => {
+    socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
+      // reorder users so that this user is first in the array
+      const reorderedUsers: User[] = []
+      const userIndex = updatedUsers.findIndex((user) => user.name === username)
+
+      for (let index = userIndex, reorderedIndex = 0; reorderedIndex < updatedUsers.length; index++, reorderedIndex++) {
+        if (index === updatedUsers.length) index = 0
+        reorderedUsers[reorderedIndex] = updatedUsers[index]
+      }
+      setUsers(reorderedUsers)
+
+      if (isGm) {
+        console.log("gm passInitialDicePoolsAndCandles")
+
+        socket.emit("passInitialDicePoolsAndCandles", { room, dicePools, candles })
+      }
+      if (toastText) toast(toastText)
+    })
+
+    socket.on("passedInitialDicePoolsAndCandles", ({ dicePools: _dicePools, candles: _candles }) => {
+      console.log("passedInitialDicePoolsAndCandles", _dicePools)
+      setDicePools(_dicePools)
+      setCandles(_candles)
+    })
+
+    socket.on("candleChanged", ({ index, isLit, username: _username }) => {
+      setCandles((prevState) => {
+        const newState = [...prevState]
+        newState[index] = isLit
+        return newState
+      })
+      if (_username !== username) {
+        toast(`${_username} ${isLit ? "lit" : "extinguished"} a candle.`)
+      }
+    })
+
+    socket.on("rolled", ({ dicePool, dice, username: _username }) => {
+      setDicePools((prevState) => {
+        const newState = { ...prevState }
+        dice.forEach((d, i) => (newState[dicePool][i].num = d))
+        return newState
+      })
+      if (_username !== username) {
+        toast(`${username} rolled the ${dicePool}.`)
+      }
+    })
+
+    socket.on("dragStarted", ({ username, dieId }) => {
+      setDraggingDice((prevState) => [...prevState, { dieId, username }])
+    })
+
+    socket.on("dragEnded", ({ prevDicePool, newDicePool, dieId }) => {
+      setDraggingDice((prevState) => {
+        const newState = [...prevState]
+        const index = newState.findIndex((entry) => entry.dieId === dieId)
+        if (index > -1) {
+          newState.splice(index, 1)
+        }
+        return newState
+      })
+      transferDieToNewPool(dieId, prevDicePool, newDicePool)
+    })
+
+    return () => {
+      socket.removeAllListeners()
+    }
+  }, [candles, dicePools, isGm, room, transferDieToNewPool, username])
 
   if (!username) {
     return <Lobby room={room} />
@@ -136,19 +164,28 @@ export default function Room() {
     socket.emit("roll", { dicePool, diceCount: dicePools[dicePool].length, username, room })
   }
 
+  function handleCandleToggle(index) {
+    socket.emit("candleChange", { index, isLit: !candles[index], username, room })
+  }
+
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       {/* users */}
       <div className="absolute w-full h-full">
         {users.map((user, i) => (
-          <div className={clsx(getUserPositionClasses(i, users.length), "absolute text-center")}>{user.name}</div>
+          <div
+            key={user.name}
+            className={clsx(getUserPositionClasses(i, users.length), "absolute text-center text-yellow")}
+          >
+            {user.name}
+          </div>
         ))}
       </div>
       {/* table */}
       <div
         className="bg-[length:250px] absolute w-[105%] h-[105%] rounded-[100%]"
         style={{
-          background: "radial-gradient(ellipse at center, rgba(255, 207, 74, 0.9) 0%, rgba(255, 207, 74, 0) 70%",
+          background: "radial-gradient(ellipse at center, rgba(255, 207, 74, 1) 0%, rgba(255, 207, 74, 0) 67%",
         }}
       />
       <div
@@ -157,8 +194,8 @@ export default function Room() {
       />
       {/* candles */}
       <div className="relative w-full h-full scale-75 mb-10">
-        {[...Array(10)].map((_, i) => (
-          <Candle key={i} index={i} isAnimated={isAnimated} />
+        {candles.map((isLit, i) => (
+          <Candle key={i} index={i} isLit={isLit} onToggle={() => handleCandleToggle(i)} />
         ))}
       </div>
       {/* dice */}

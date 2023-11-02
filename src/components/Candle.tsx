@@ -1,9 +1,8 @@
 import clsx from "clsx"
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import type { Engine } from "tsparticles-engine"
 import { loadSlim } from "tsparticles-slim"
 import { loadEmittersPlugin } from "tsparticles-plugin-emitters"
-
 import FlameParticles from "./FlameParticles"
 import SmokeParticles from "./SmokeParticles"
 
@@ -20,39 +19,28 @@ const positionClasses = [
   "top-[10%] left-[20%]",
 ]
 
-export default function Candle({ index, isAnimated }) {
-  const [isLit, setIsLit] = useState(true)
-
+export default function Candle({ index, isLit, onToggle }) {
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadEmittersPlugin(engine, false)
     await loadSlim(engine, false)
   }, [])
 
   return (
-    <button
-      onClick={() => setIsLit((prevState) => !prevState)}
-      className={clsx(positionClasses[index], "absolute w-[128px]")}
-    >
+    <button onClick={onToggle} className={clsx(positionClasses[index], "absolute w-[128px]")}>
       <img src="/candle.png" className="absolute inset-0 w-full" style={{ imageRendering: "pixelated" }} />
-      {isAnimated ? (
+      {isLit ? (
         <>
-          {isLit ? (
-            <>
-              <div
-                className=" w-[200px] h-[200px] absolute -top-[105px] -left-[36px]"
-                style={{
-                  background: "radial-gradient(circle at center, rgba(255, 207, 74, 0.5) 0%, rgba(255, 207, 74, 0) 60%",
-                }}
-              />
-              <FlameParticles candleIndex={index} particlesInit={particlesInit} />
-              <div className="-top-[1px] left-[61px] w-[6px] h-[6px] absolute bg-yellow" />
-            </>
-          ) : (
-            <SmokeParticles candleIndex={index} />
-          )}
+          <div
+            className=" w-[200px] h-[200px] absolute -top-[105px] -left-[36px]"
+            style={{
+              background: "radial-gradient(circle at center, rgba(255, 207, 74, 0.5) 0%, rgba(255, 207, 74, 0) 60%",
+            }}
+          />
+          <FlameParticles candleIndex={index} particlesInit={particlesInit} />
+          <div className="-top-[1px] left-[61px] w-[6px] h-[6px] absolute bg-yellow" />
         </>
       ) : (
-        <>{isLit && <div className="absolute left-12 bottom-0 w-8 h-12 bg-[orange]" />}</>
+        <SmokeParticles candleIndex={index} />
       )}
     </button>
   )

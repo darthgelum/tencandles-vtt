@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import { useDraggable } from "@dnd-kit/core"
-import { PiHandGrabbingBold } from "react-icons/pi"
+import { PiHandGrabbingFill } from "react-icons/pi"
 import Die from "types/Die"
 import Drag from "types/Drag"
 import { useEffect, useState } from "react"
@@ -38,13 +38,13 @@ export default function DraggableDie({
   const delta = transform || peerDrag?.delta
   const style = delta ? { transform: `translate3d(${delta.x}px, ${delta.y}px, 0)` } : undefined
 
-  let colorClasses = "text-yellow border-yellow"
+  let colorClasses
   if (die.id === HOPE_DIE_ID) {
     colorClasses = die.num >= 5 ? "text-darkgrey bg-blue border-blue" : "text-blue border-blue bg-darkgrey"
   } else {
     colorClasses =
       die.num === 6
-        ? "text-green bg-darkgrey border-green"
+        ? "text-green border-green bg-darkgrey"
         : die.num === 1
         ? "text-red border-red bg-darkgrey"
         : "text-yellow border-yellow bg-darkgrey"
@@ -55,7 +55,7 @@ export default function DraggableDie({
       ref={setNodeRef}
       className={clsx(
         colorClasses,
-        isBeingDraggedBySomeoneElse && "opacity-50",
+        isBeingDraggedBySomeoneElse && "opacity-60",
         isDragging ? "z-40" : "z-30",
         "relative flex justify-center items-center border-3 text-3xl w-16 h-16 pb-0.5 pl-0.5 cursor-grab active:cursor-grabbing hover:brightness-125",
         moreClasses
@@ -66,8 +66,8 @@ export default function DraggableDie({
     >
       {die.num}
       {isBeingDraggedBySomeoneElse && (
-        <div className="absolute top-5 left-5">
-          <PiHandGrabbingBold className="bg" />
+        <div className="absolute top-[6px] left-[12px] text-white text-sm flex flex-col justify-center items-center w-8 z-50">
+          <PiHandGrabbingFill className="w-8 h-8" />
           {isDraggedByUsername}
         </div>
       )}

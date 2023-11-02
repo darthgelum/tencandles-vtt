@@ -65,10 +65,13 @@ export default function Lobby({ room }: { room?: string }) {
         <input
           placeholder="Enter your name"
           onChange={(e) => setusername(e.target.value)}
-          className="text-yellow my-3 focus:border-yellow focus:ring-yellow w-full sm:w-96 text-white p-2 py-3 bg-[transparent] border-2 border-yellow text-center placeholder:text-yellow placeholder:opacity-60"
+          className="text-yellow my-3 focus:border-yellow focus:ring-yellow w-full sm:w-96 p-2 py-3 bg-[transparent] border-2 border-yellow text-center placeholder:text-yellow placeholder:opacity-60"
         />
-        {error && <div className="text-red text-lg">{error}</div>}
-        <button disabled={!username || isLoading} className="w-full sm:w-96 bg-yellow text-black py-2 px-4">
+        {error && <div className="text-red text-sm mb-3 -mt-1">{error}</div>}
+        <button
+          disabled={!username || isLoading}
+          className="w-full sm:w-96 bg-yellow text-black py-3 px-4 hover:brightness-[110%]"
+        >
           {buttonText}
         </button>
       </form>

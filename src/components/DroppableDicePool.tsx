@@ -58,6 +58,7 @@ export default function DroppableDicePool({
         {dice.map((die) =>
           dicePool === DicePool.Stash && die.id === HOPE_DIE_ID ? null : (
             <DraggableDie
+              key={die.id}
               die={die}
               isDraggedByUsername={draggingDice.find((d) => d.dieId === die.id)?.username}
               moreClasses={dicePool === DicePool.Stash ? "mx-auto -mb-14" : ""}
