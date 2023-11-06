@@ -1,3 +1,5 @@
+This is the frontend repo for a virtual tabletop for [Ten Candles](https://cavalrygames.com/ten-candles), a tabletop roleplaying game by Stephen Dewey. It uses React/Vite, TypeScript, Tailwind, and Socket.IO. The server repo can be found [here](https://github.com/robyn3choi/tencandles-vtt-server).
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
