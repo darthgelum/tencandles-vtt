@@ -5,7 +5,7 @@ import Card from "types/Card"
 
 const xShift = 40
 
-export default function StackableCard({ card }: { card: Card }) {
+export default function CardDraggable({ card }: { card: Card }) {
   const {
     activeIndex,
     attributes,

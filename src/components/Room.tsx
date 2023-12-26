@@ -6,7 +6,7 @@ import { useUser } from "context/UserContext"
 import { useParams } from "react-router-dom"
 import { getInitialDice } from "utils/helpers"
 import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core"
-import DroppableDicePool from "./DroppableDicePool"
+import DicePoolDroppable from "./DicePoolDroppable"
 import Die from "types/Die"
 import DicePool from "enums/DicePool"
 import { HOPE_DIE_ID } from "utils/constants"
@@ -172,7 +172,7 @@ export default function Room() {
       <DndContext onDragStart={handleDieDragStart} onDragEnd={handleDieDragEnd}>
         <div className="absolute w-[50%] xl:w-[60%] h-[55%] flex justify-center z-10">
           <div className="relative w-full">
-            <DroppableDicePool
+            <DicePoolDroppable
               dicePool={DicePool.Player}
               dice={dicePools[DicePool.Player]}
               draggingDice={draggingDice}
@@ -180,7 +180,7 @@ export default function Room() {
               onRoll={() => handleRoll(DicePool.Player)}
               moreClasses="p-2 pt-0 h-[50%] border-b-6 border-brown"
             />
-            <DroppableDicePool
+            <DicePoolDroppable
               dicePool={DicePool.GM}
               dice={dicePools[DicePool.GM]}
               draggingDice={draggingDice}
@@ -189,7 +189,7 @@ export default function Room() {
               moreClasses="p-2 pb-0 h-[50%]"
             />
           </div>
-          <DroppableDicePool
+          <DicePoolDroppable
             dicePool={DicePool.Stash}
             dice={dicePools[DicePool.Stash]}
             draggingDice={draggingDice}

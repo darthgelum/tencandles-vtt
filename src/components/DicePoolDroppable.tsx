@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import { useDroppable } from "@dnd-kit/core"
 import Die from "types/Die"
-import DraggableDie from "./DraggableDie"
+import DieDraggable from "./DieDraggable"
 import DicePool from "enums/DicePool"
 import { HOPE_DIE_ID } from "utils/constants"
 
@@ -14,7 +14,7 @@ type Props = {
   moreClasses?: string
 }
 
-export default function DroppableDicePool({
+export default function DicePoolDroppable({
   dicePool,
   dice,
   draggingDice,
@@ -49,7 +49,7 @@ export default function DroppableDicePool({
         )}
       >
         {dicePool === DicePool.Stash && hopeDie && (
-          <DraggableDie
+          <DieDraggable
             die={hopeDie}
             isDraggedByUsername={draggingDice.find((d) => d.dieId === HOPE_DIE_ID)?.username}
             moreClasses="mx-auto mb-2"
@@ -57,7 +57,7 @@ export default function DroppableDicePool({
         )}
         {dice.map((die) =>
           dicePool === DicePool.Stash && die.id === HOPE_DIE_ID ? null : (
-            <DraggableDie
+            <DieDraggable
               key={die.id}
               die={die}
               isDraggedByUsername={draggingDice.find((d) => d.dieId === die.id)?.username}

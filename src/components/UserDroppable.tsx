@@ -8,7 +8,7 @@ type Props = {
   moreClasses?: string
 }
 
-export default function DroppableUser({ name, isThisUser, onOpenCardStack, moreClasses }: Props) {
+export default function UserDroppable({ name, isThisUser, onOpenCardStack, moreClasses }: Props) {
   const { isOver, setNodeRef } = useDroppable({
     id: name,
   })

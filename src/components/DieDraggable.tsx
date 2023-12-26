@@ -8,7 +8,7 @@ import socket from "utils/socket"
 import { useUser } from "context/UserContext"
 import { HOPE_DIE_ID } from "utils/constants"
 
-export default function DraggableDie({
+export default function DieDraggable({
   die,
   isDraggedByUsername,
   moreClasses,
