@@ -2,23 +2,21 @@ import { useCallback, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import socket from "utils/socket"
 import Candle from "components/Candle"
-import User from "types/User"
 import { useUser } from "context/UserContext"
 import { useParams } from "react-router-dom"
-import Lobby from "./Lobby"
-import clsx from "clsx"
-import { getInitialDice, getUserPositionClasses } from "utils/helpers"
+import { getInitialDice } from "utils/helpers"
 import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core"
 import DroppableDicePool from "./DroppableDicePool"
 import Die from "types/Die"
 import DicePool from "enums/DicePool"
 import { HOPE_DIE_ID } from "utils/constants"
+import Lobby from "./Lobby"
+import UI from "./UI"
 
 export default function Room() {
   const { username, isGm } = useUser()
   const { room } = useParams()
 
-  const [users, setUsers] = useState<User[]>([])
   const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
   const [dicePools, setDicePools] = useState<{ [key in DicePool]: Die[] }>({
     [DicePool.Player]: getInitialDice(),
@@ -61,24 +59,6 @@ export default function Room() {
   }, [isGm, room, username])
 
   useEffect(() => {
-    socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
-      // reorder users so that this user is first in the array
-      const reorderedUsers: User[] = []
-      const userIndex = updatedUsers.findIndex((user) => user.name === username)
-
-      for (let index = userIndex, reorderedIndex = 0; reorderedIndex < updatedUsers.length; index++, reorderedIndex++) {
-        if (index === updatedUsers.length) index = 0
-        reorderedUsers[reorderedIndex] = updatedUsers[index]
-      }
-      setUsers(reorderedUsers)
-
-      if (isGm) {
-        socket.emit("passInitialDicePoolsAndCandles", { room, dicePools, candles })
-      }
-
-      if (toastText) toast(toastText)
-    })
-
     socket.on("passedInitialDicePoolsAndCandles", ({ dicePools: _dicePools, candles: _candles }) => {
       setDicePools(_dicePools)
       setCandles(_candles)
@@ -106,11 +86,11 @@ export default function Room() {
       }
     })
 
-    socket.on("dragStarted", ({ username, dieId }) => {
+    socket.on("dieDragStarted", ({ username, dieId }) => {
       setDraggingDice((prevState) => [...prevState, { dieId, username }])
     })
 
-    socket.on("dragEnded", ({ prevDicePool, newDicePool, dieId }) => {
+    socket.on("dieDragEnded", ({ prevDicePool, newDicePool, dieId }) => {
       setDraggingDice((prevState) => {
         const newState = [...prevState]
         const index = newState.findIndex((entry) => entry.dieId === dieId)
@@ -131,7 +111,7 @@ export default function Room() {
     return <Lobby room={room} />
   }
 
-  function handleDragStart(event: DragStartEvent) {
+  function handleDieDragStart(event: DragStartEvent) {
     let dicePool = DicePool.Player
 
     if (dicePools[DicePool.GM].find((die) => die.id === event.active.id)) {
@@ -140,10 +120,10 @@ export default function Room() {
       dicePool = DicePool.Stash
     }
 
-    socket.emit("dragStart", { username, room, dieId: event.active.id, dicePool })
+    socket.emit("dieDragStart", { username, room, dieId: event.active.id, dicePool })
   }
 
-  function handleDragEnd(event: DragEndEvent) {
+  function handleDieDragEnd(event: DragEndEvent) {
     const newDicePool = event.over?.id
     if (!newDicePool) return
 
@@ -155,7 +135,7 @@ export default function Room() {
     }
     transferDieToNewPool(event.active.id, prevDicePool, newDicePool)
 
-    socket.emit("dragEnd", { username, room, dieId: event.active.id, prevDicePool, newDicePool })
+    socket.emit("dieDragEnd", { username, room, dieId: event.active.id, prevDicePool, newDicePool })
   }
 
   function handleRoll(dicePool: DicePool) {
@@ -167,21 +147,10 @@ export default function Room() {
   }
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <>
       <p className="absolute top-1 w-full text-center text-xs text-lightgrey">
         To invite players to join this room, send them this page’s URL.
       </p>
-      {/* users */}
-      <div className="absolute w-full h-full">
-        {users.map((user, i) => (
-          <div
-            key={user.name}
-            className={clsx(getUserPositionClasses(i, users.length), "absolute text-center text-yellow")}
-          >
-            {user.name}
-          </div>
-        ))}
-      </div>
       {/* table */}
       <div
         className="bg-[length:250px] absolute w-[105%] h-[105%] rounded-[100%]"
@@ -194,38 +163,41 @@ export default function Room() {
         style={{ imageRendering: "pixelated" }}
       />
       {/* candles */}
-      <div className="relative w-full h-full scale-75 mb-10">
+      <div className="relative w-full h-full scale-75 mb-10 z-10">
         {candles.map((isLit, i) => (
           <Candle key={i} index={i} isLit={isLit} onToggle={() => handleCandleToggle(i)} />
         ))}
       </div>
       {/* dice */}
-      <div className="absolute w-[50%] xl:w-[60%] h-[55%] flex justify-center">
-        <div className="relative w-full">
+      <DndContext onDragStart={handleDieDragStart} onDragEnd={handleDieDragEnd}>
+        <div className="absolute w-[50%] xl:w-[60%] h-[55%] flex justify-center z-10">
+          <div className="relative w-full">
+            <DroppableDicePool
+              dicePool={DicePool.Player}
+              dice={dicePools[DicePool.Player]}
+              draggingDice={draggingDice}
+              showRollButton={!isGm}
+              onRoll={() => handleRoll(DicePool.Player)}
+              moreClasses="p-2 pt-0 h-[50%] border-b-6 border-brown"
+            />
+            <DroppableDicePool
+              dicePool={DicePool.GM}
+              dice={dicePools[DicePool.GM]}
+              draggingDice={draggingDice}
+              showRollButton={isGm}
+              onRoll={() => handleRoll(DicePool.GM)}
+              moreClasses="p-2 pb-0 h-[50%]"
+            />
+          </div>
           <DroppableDicePool
-            dicePool={DicePool.Player}
-            dice={dicePools[DicePool.Player]}
+            dicePool={DicePool.Stash}
+            dice={dicePools[DicePool.Stash]}
             draggingDice={draggingDice}
-            showRollButton={!isGm}
-            onRoll={() => handleRoll(DicePool.Player)}
-            moreClasses="p-2 pt-0 h-[50%] border-b-6 border-brown"
-          />
-          <DroppableDicePool
-            dicePool={DicePool.GM}
-            dice={dicePools[DicePool.GM]}
-            draggingDice={draggingDice}
-            showRollButton={isGm}
-            onRoll={() => handleRoll(DicePool.GM)}
-            moreClasses="p-2 pb-0 h-[50%]"
+            moreClasses="p-2 my-12 border-l-6 border-brown"
           />
         </div>
-        <DroppableDicePool
-          dicePool={DicePool.Stash}
-          dice={dicePools[DicePool.Stash]}
-          draggingDice={draggingDice}
-          moreClasses="p-2 my-12 border-l-6 border-brown"
-        />
-      </div>
-    </DndContext>
+      </DndContext>
+      <UI />
+    </>
   )
 }

@@ -1,21 +1,44 @@
 "use client"
 
-import { createContext, useContext, useState, useMemo, ReactNode } from "react"
+import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from "react"
+import Card from "types/Card"
 
 const UserContext = createContext<ProviderValue | undefined>(undefined)
 
 type ProviderValue = {
   username: string
-  setUsername: (value: string) => void
+  setUsername: Dispatch<SetStateAction<string>>
   isGm: boolean
-  setIsGm: (value: boolean) => void
+  setIsGm: Dispatch<SetStateAction<boolean>>
+  cards: Card[]
+  setCards: Dispatch<SetStateAction<Card[]>>
+  addCard: (card: Card) => void
+  removeCard: (cardId: string) => void
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [username, setUsername] = useState<string>("")
   const [isGm, setIsGm] = useState(false)
+  const [cards, setCards] = useState<Card[]>([
+    // { id: "1", type: "Virtue", content: "" },
+    // { id: "2", type: "Virtue", content: "" },
+    // { id: "3", type: "Virtue", content: "" },
+    // { id: "4", type: "Virtue", content: "" },
+    // { id: "5", type: "Virtue", content: "" },
+  ])
 
-  const providerValue = useMemo(() => ({ username, setUsername, isGm, setIsGm }), [isGm, username])
+  function addCard(card: Card) {
+    setCards((prevState) => [card, ...prevState])
+  }
+
+  function removeCard(cardId: string) {
+    setCards((prevState) => prevState.filter((card) => card.id !== cardId))
+  }
+
+  const providerValue = useMemo(
+    () => ({ username, setUsername, isGm, setIsGm, cards, setCards, addCard, removeCard }),
+    [isGm, username, cards]
+  )
 
   return <UserContext.Provider value={providerValue}>{children}</UserContext.Provider>
 }

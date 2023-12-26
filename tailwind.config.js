@@ -13,7 +13,8 @@ export default {
         orange: "#ff811b",
         red: "#EF2D56",
         green: "#4ed457",
-        blue: "#51dadc",
+        lightblue: "#51dadc",
+        blue: "#2C497F",
         brown: "#6e3813",
         yellowTransparent: "rgb(255, 207, 74, 0.25)",
       },
@@ -32,5 +33,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 }

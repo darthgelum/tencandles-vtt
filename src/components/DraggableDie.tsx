@@ -40,7 +40,8 @@ export default function DraggableDie({
 
   let colorClasses
   if (die.id === HOPE_DIE_ID) {
-    colorClasses = die.num >= 5 ? "text-darkgrey bg-blue border-blue" : "text-blue border-blue bg-darkgrey"
+    colorClasses =
+      die.num >= 5 ? "text-darkgrey bg-lightblue border-lightblue" : "text-lightblue border-lightblue bg-darkgrey"
   } else {
     colorClasses =
       die.num === 6
