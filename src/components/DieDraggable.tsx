@@ -17,9 +17,9 @@ export default function DieDraggable({
   isDraggedByUsername?: string
   moreClasses?: string
 }) {
-  const { username } = useUser()
+  const { user } = useUser()
 
-  const isBeingDraggedBySomeoneElse = isDraggedByUsername && isDraggedByUsername !== username
+  const isBeingDraggedBySomeoneElse = isDraggedByUsername && isDraggedByUsername !== user!.name
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: die.id,

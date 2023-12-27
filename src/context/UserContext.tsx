@@ -2,14 +2,17 @@
 
 import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from "react"
 import Card from "types/Card"
+import User from "types/User"
 
 const UserContext = createContext<ProviderValue | undefined>(undefined)
 
 type ProviderValue = {
-  username: string
-  setUsername: Dispatch<SetStateAction<string>>
-  isGm: boolean
-  setIsGm: Dispatch<SetStateAction<boolean>>
+  // username: string
+  // setUsername: Dispatch<SetStateAction<string>>
+  // isGm: boolean
+  user?: User
+  setUser: Dispatch<SetStateAction<User | undefined>>
+  // setIsGm: Dispatch<SetStateAction<boolean>>
   cards: Card[]
   setCards: Dispatch<SetStateAction<Card[]>>
   addCard: (card: Card) => void
@@ -17,8 +20,9 @@ type ProviderValue = {
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [username, setUsername] = useState<string>("")
-  const [isGm, setIsGm] = useState(false)
+  const [user, setUser] = useState<User>()
+  // const [username, setUsername] = useState<string>("")
+  // const [isGm, setIsGm] = useState(false)
   const [cards, setCards] = useState<Card[]>([
     // { id: "1", type: "Virtue", content: "" },
     // { id: "2", type: "Virtue", content: "" },
@@ -35,10 +39,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setCards((prevState) => prevState.filter((card) => card.id !== cardId))
   }
 
-  const providerValue = useMemo(
-    () => ({ username, setUsername, isGm, setIsGm, cards, setCards, addCard, removeCard }),
-    [isGm, username, cards]
-  )
+  const providerValue = useMemo(() => ({ user, setUser, cards, setCards, addCard, removeCard }), [user, cards])
 
   return <UserContext.Provider value={providerValue}>{children}</UserContext.Provider>
 }

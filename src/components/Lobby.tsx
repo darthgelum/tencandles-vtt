@@ -4,10 +4,11 @@ import { useState } from "react"
 import { getRoomName } from "utils/helpers"
 import { useUser } from "context/UserContext"
 import { useNavigate } from "react-router-dom"
+import { nanoid } from "nanoid"
 
 export default function Lobby({ room }: { room?: string }) {
   const navigate = useNavigate()
-  const { setUsername, setIsGm } = useUser()
+  const { setUser } = useUser()
 
   const [username, setusername] = useState("")
   const [error, setError] = useState<string>("")
@@ -24,15 +25,14 @@ export default function Lobby({ room }: { room?: string }) {
         if (result.doesUserExist) {
           throw new Error("There is already a user with this name in the room.")
         }
-        setUsername(username)
+        setUser({ id: nanoid(), name: username, isGm: false })
       } catch (err: any) {
         setIsLoading(false)
         return setError(err.message)
       }
     } else {
-      setIsGm(true)
+      setUser({ id: nanoid(), name: username, isGm: true })
       room = getRoomName()
-      setUsername(username)
       navigate(`/room/${room}`)
     }
   }

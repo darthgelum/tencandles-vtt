@@ -7,6 +7,7 @@ import Lobby from "components/Lobby"
 import ErrorPage from "components/ErrorPage"
 import Room from "components/Room"
 import { UserProvider } from "context/UserContext"
+import Test from "components/Test"
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "room/:room",
     element: <Room />,
+  },
+  {
+    path: "test",
+    element: <Test />,
   },
 ])
 

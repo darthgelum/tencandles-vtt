@@ -7,8 +7,9 @@
   src: url("../fonts/pixelmix.ttf");
 }
 
-body {
-  @apply overflow-hidden;
+body,
+html {
+  @apply h-screen w-screen overflow-hidden;
 }
 
 #root {

@@ -14,7 +14,7 @@ import Lobby from "./Lobby"
 import UI from "./UI"
 
 export default function Room() {
-  const { username, isGm } = useUser()
+  const { user, cards } = useUser()
   const { room } = useParams()
 
   const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
@@ -45,10 +45,10 @@ export default function Room() {
       socket.connect()
 
       socket.on("connect", () => {
-        socket.emit("userJoined", { username, room, isGm })
+        socket.emit("userJoined", { user, room })
       })
     }
-    if (username) initSocket()
+    if (user) initSocket()
 
     return () => {
       if (socket) {
@@ -56,7 +56,7 @@ export default function Room() {
         socket.disconnect()
       }
     }
-  }, [isGm, room, username])
+  }, [room, user])
 
   useEffect(() => {
     socket.on("passedInitialDicePoolsAndCandles", ({ dicePools: _dicePools, candles: _candles }) => {
@@ -64,24 +64,24 @@ export default function Room() {
       setCandles(_candles)
     })
 
-    socket.on("candleChanged", ({ index, isLit, username: _username }) => {
+    socket.on("candleChanged", ({ index, isLit, username }) => {
       setCandles((prevState) => {
         const newState = [...prevState]
         newState[index] = isLit
         return newState
       })
-      if (_username !== username) {
-        toast(`${_username} ${isLit ? "lit" : "extinguished"} a candle.`)
+      if (username !== user!.name) {
+        toast(`${username} ${isLit ? "lit" : "extinguished"} a candle.`)
       }
     })
 
-    socket.on("rolled", ({ dicePool, dice, username: _username }) => {
+    socket.on("rolled", ({ dicePool, dice, username }) => {
       setDicePools((prevState) => {
         const newState = { ...prevState }
         dice.forEach((d, i) => (newState[dicePool][i].num = d))
         return newState
       })
-      if (_username !== username) {
+      if (username !== user!.name) {
         toast(`${username} rolled the ${dicePool}.`)
       }
     })
@@ -105,9 +105,11 @@ export default function Room() {
     return () => {
       socket.removeAllListeners()
     }
-  }, [candles, dicePools, isGm, room, transferDieToNewPool, username])
+    // for some reason we need to rerun this useeffect when cards is updated
+    // or else the socket will be lost after cards is updated
+  }, [candles, dicePools, room, transferDieToNewPool, user, cards])
 
-  if (!username) {
+  if (!user) {
     return <Lobby room={room} />
   }
 
@@ -120,7 +122,7 @@ export default function Room() {
       dicePool = DicePool.Stash
     }
 
-    socket.emit("dieDragStart", { username, room, dieId: event.active.id, dicePool })
+    socket.emit("dieDragStart", { username: user!.name, room, dieId: event.active.id, dicePool })
   }
 
   function handleDieDragEnd(event: DragEndEvent) {
@@ -133,17 +135,19 @@ export default function Room() {
     } else if (dicePools[DicePool.Stash].find((die) => die.id === event.active.id)) {
       prevDicePool = DicePool.Stash
     }
+    if (prevDicePool === newDicePool) return
+
     transferDieToNewPool(event.active.id, prevDicePool, newDicePool)
 
-    socket.emit("dieDragEnd", { username, room, dieId: event.active.id, prevDicePool, newDicePool })
+    socket.emit("dieDragEnd", { username: user!.name, room, dieId: event.active.id, prevDicePool, newDicePool })
   }
 
   function handleRoll(dicePool: DicePool) {
-    socket.emit("roll", { dicePool, diceCount: dicePools[dicePool].length, username, room })
+    socket.emit("roll", { dicePool, diceCount: dicePools[dicePool].length, username: user!.name, room })
   }
 
   function handleCandleToggle(index) {
-    socket.emit("candleChange", { index, isLit: !candles[index], username, room })
+    socket.emit("candleChange", { index, isLit: !candles[index], username: user!.name, room })
   }
 
   return (
@@ -176,7 +180,7 @@ export default function Room() {
               dicePool={DicePool.Player}
               dice={dicePools[DicePool.Player]}
               draggingDice={draggingDice}
-              showRollButton={!isGm}
+              showRollButton={!user.isGm}
               onRoll={() => handleRoll(DicePool.Player)}
               moreClasses="p-2 pt-0 h-[50%] border-b-6 border-brown"
             />
@@ -184,7 +188,7 @@ export default function Room() {
               dicePool={DicePool.GM}
               dice={dicePools[DicePool.GM]}
               draggingDice={draggingDice}
-              showRollButton={isGm}
+              showRollButton={!user.isGm}
               onRoll={() => handleRoll(DicePool.GM)}
               moreClasses="p-2 pb-0 h-[50%]"
             />

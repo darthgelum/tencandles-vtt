@@ -8,13 +8,13 @@ export default function CardStack({ onClose }: { onClose: () => void }) {
   return (
     <>
       <div className="h-screen w-screen fixed bg-black opacity-40 z-50" onClick={() => onClose()} />
-      <SortableContext items={cards} strategy={verticalListSortingStrategy}>
-        <div className="absolute z-50 mb-[250px]">
-          {cards.map((card) => (
-            <CardDraggable key={card.id} card={card} />
-          ))}
-        </div>
-      </SortableContext>
+      {/* <SortableContext items={cards}> */}
+      <div className="absolute z-50 mb-[250px]">
+        {cards.map((card) => (
+          <CardDraggable key={card.id} card={card} />
+        ))}
+      </div>
+      {/* </SortableContext> */}
     </>
   )
 }
