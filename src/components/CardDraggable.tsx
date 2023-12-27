@@ -1,17 +1,17 @@
+import { useState } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import clsx from "clsx"
+import { TbX } from "react-icons/tb"
 import Card from "types/Card"
+import { getCardClasses } from "utils/helpers"
 
 const xShift = 40
 
-function isValidIndex(index: number | null): index is number {
-  return index !== null && index >= 0
-}
+export default function CardDraggable({ card, onDelete }: { card: Card; onDelete: () => void }) {
+  const [isDragDisabled, setIsDragDisabled] = useState(false)
 
-export default function CardDraggable({ card }: { card: Card }) {
   const {
-    newIndex,
     activeIndex,
     attributes,
     listeners,
@@ -19,15 +19,13 @@ export default function CardDraggable({ card }: { card: Card }) {
     transform,
     transition,
     isDragging,
-    isOver,
     overIndex,
     index,
     isSorting,
-    rect,
-    over,
   } = useSortable({
     id: card.id,
     data: { card },
+    disabled: isDragDisabled,
   })
 
   const isBehindDraggingCard = index > activeIndex && index <= overIndex
@@ -52,11 +50,21 @@ export default function CardDraggable({ card }: { card: Card }) {
       className={clsx(
         isSorting && "opacity-70",
         isDragging && "!opacity-0",
-        "p-4 bg-yellow w-[500px] h-[300px] text-black shadow-[0px_0px_30px_5px_rgba(0,0,0,0.2)] mb-[-250px] translate-y-0 hover:-translate-y-2"
+        getCardClasses(card.type),
+        "mb-[-168px] translate-y-0 hover:-translate-y-2"
       )}
     >
-      <div className="text-lg">{card.type}</div>
-      <div className="mt-2">{card.content}</div>
+      <button
+        className="absolute top-3 right-3 hover:text-red"
+        onClick={onDelete}
+        // this prevents clicking delete button from starting drag
+        onMouseEnter={() => setIsDragDisabled(true)}
+        onMouseLeave={() => setIsDragDisabled(false)}
+      >
+        <TbX className="h-6 w-6" />
+      </button>
+      <div className="">{card.type}</div>
+      <div className="mt-3 text-sm">{card.content}</div>
     </div>
   )
 }

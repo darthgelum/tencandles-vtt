@@ -1,6 +1,5 @@
 import clsx from "clsx"
 import { useDroppable } from "@dnd-kit/core"
-import { useSortable } from "@dnd-kit/sortable"
 import User from "types/User"
 
 type Props = {
@@ -11,23 +10,6 @@ type Props = {
 }
 
 export default function UserDroppable({ user, isThisUser, onOpenCardStack, moreClasses }: Props) {
-  // const {
-  //   newIndex,
-  //   activeIndex,
-  //   attributes,
-  //   listeners,
-  //   setNodeRef,
-  //   transform,
-  //   transition,
-  //   isDragging,
-  //   isOver,
-  //   overIndex,
-  //   index,
-  //   rect,
-  // } = useSortable({
-  //   id,
-  // })
-
   const { setNodeRef, isOver } = useDroppable({ id: user.id, data: { user } })
 
   function handleClick() {
@@ -38,8 +20,8 @@ export default function UserDroppable({ user, isThisUser, onOpenCardStack, moreC
     <button
       ref={setNodeRef}
       className={clsx(
-        isOver && !isThisUser && "bg-yellowTransparent",
-        "absolute text-center text-yellow z-50 h-24",
+        isOver && "scale-125",
+        "absolute text-center text-yellow z-50 h-fit w-fit p-4 bg-blue z-[999] hover:scale-125",
         moreClasses
       )}
       onClick={handleClick}

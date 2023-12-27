@@ -2,32 +2,30 @@ import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useParams } from "react-router-dom"
 import clsx from "clsx"
-import { DndContext, DragEndEvent, DragOverlay, MeasuringStrategy } from "@dnd-kit/core"
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-  rectSwappingStrategy,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { restrictToWindowEdges } from "@dnd-kit/modifiers"
+import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
 import User from "types/User"
 import { useUser } from "context/UserContext"
-import { getUserPositionClasses } from "utils/helpers"
-import CardModal from "./CardModal"
-import CardStack from "./CardStack"
+import { getCardClasses, getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
+import CreateCardModal from "./CreateCardModal"
 import Card from "types/Card"
 import UserDroppable from "./UserDroppable"
+import CardDraggable from "./CardDraggable"
+import DeleteCardModal from "./DeleteCardModal"
+import { TbX } from "react-icons/tb"
+import CardType from "enums/CardType"
 
 export default function UI() {
   const { user, cards, addCard, removeCard, setCards } = useUser()
   const { room } = useParams()
 
   const [users, setUsers] = useState<User[]>([])
-  const [showCardModal, setShowCardModal] = useState(false)
-  const [showCardStack, setShowCardStack] = useState(false)
+  const [showCreateCardModal, setShowCreateCardModal] = useState(false)
+  const [showCards, setShowCards] = useState(false)
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
+  const [isDraggingCardOverUser, setIsDraggingCardOverUser] = useState(false)
+  const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
 
   useEffect(() => {
     socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
@@ -54,6 +52,16 @@ export default function UI() {
     }
   }, [addCard, user])
 
+  function handleCardDragMove(event: DragEndEvent) {
+    // console.log(event.collisions)
+    // console.log(event.over)
+    if (event.over?.data.current?.user) {
+      setIsDraggingCardOverUser(true)
+    } else if (isDraggingCardOverUser) {
+      setIsDraggingCardOverUser(false)
+    }
+  }
+
   function handleCardDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (!over) return
@@ -75,52 +83,115 @@ export default function UI() {
     }
   }
 
+  const characterCard = cards.find((c) => c.type === CardType.Character)
+
   return (
     <DndContext
       onDragStart={(e) => setDraggingCard(e.active.data.current?.card || null)}
+      onDragMove={handleCardDragMove}
       onDragEnd={handleCardDragEnd}
       autoScroll={false}
-      modifiers={[restrictToWindowEdges]}
-      measuring={{
-        droppable: {
-          strategy: MeasuringStrategy.Always,
-        },
-      }}
+      collisionDetection={prioritizeUserCollisions}
     >
+      <DragOverlay>
+        {draggingCard ? (
+          <div className={getCardClasses(draggingCard.type)}>
+            <div className="absolute top-3 right-3">
+              <TbX className="h-6 w-6" />
+            </div>
+            <div className="">{draggingCard.type}</div>
+            <div className="text-sm mt-2">{draggingCard.content}</div>
+          </div>
+        ) : null}
+      </DragOverlay>
       <SortableContext items={[...cards]} strategy={verticalListSortingStrategy}>
         <div className="absolute w-screen h-screen flex justify-center items-center overflow-hidden">
-          <button className="absolute top-0 right-0 z-20" onClick={() => setShowCardModal(true)}>
-            Add card
-          </button>
-          {showCardModal && (
-            <CardModal
+          {showCreateCardModal && (
+            <CreateCardModal
               onClose={() => {
-                setShowCardModal(false)
-                setShowCardStack(true)
+                setShowCreateCardModal(false)
+                setShowCards(true)
               }}
             />
           )}
-          {showCardStack && <CardStack onClose={() => setShowCardStack(false)} />}
+          {showCards && (
+            <>
+              <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={() => setShowCards(false)} />
+              {cards.length === 0 ? (
+                <div className="flex justify-center items-center text-lg z-50 bg-grey p-6 leading-loose">
+                  You don't have any cards yet.
+                  <br />
+                  Start by clicking the "Add Card" button in the top right.
+                  <br />
+                  Or click anywhere to go back to the game.
+                </div>
+              ) : (
+                <div className={clsx(characterCard && cards.length > 1 && "gap-24", "flex")}>
+                  {characterCard && (
+                    <div
+                      className={clsx(getCardClasses(CardType.Character), cards.length === 1 ? "" : "-mt-48", "z-50")}
+                    >
+                      <div
+                        className="absolute top-3 right-3 hover:text-red"
+                        onClick={() => {
+                          setCardToDelete(characterCard)
+                          setShowCards(false)
+                        }}
+                      >
+                        <TbX className="h-6 w-6" />
+                      </div>
+                      <div className="">{CardType.Character}</div>
+                      <div className="text-sm mt-2">{characterCard.content}</div>
+                    </div>
+                  )}
+                  <div className=" z-50">
+                    {cards
+                      .filter((c) => c.type !== CardType.Character)
+                      .map((card) => (
+                        <CardDraggable
+                          key={card.id}
+                          card={card}
+                          onDelete={() => {
+                            setCardToDelete(card)
+                            setShowCards(false)
+                          }}
+                        />
+                      ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          <button
+            className="absolute top-2 right-2 z-50 text-black bg-yellow p-3 hover:brightness-110"
+            onClick={() => {
+              setShowCards(false)
+              setShowCreateCardModal(true)
+            }}
+          >
+            Add Card
+          </button>
           {/* users */}
           {users.map((u, i) => (
             <UserDroppable
               key={u.id}
               user={u}
-              isThisUser={u.name === u.name}
-              onOpenCardStack={() => setShowCardStack(true)}
+              isThisUser={u.name === user!.name}
+              onOpenCardStack={() => setShowCards(true)}
               moreClasses={getUserPositionClasses(i, users.length)}
             />
           ))}
         </div>
       </SortableContext>
-      <DragOverlay>
-        {draggingCard ? (
-          <div className="opacity-90 p-4 bg-yellow w-[500px] h-[300px] text-black shadow-[0px_0px_30px_5px_rgba(0,0,0,0.2)] mb-[-250px] translate-y-0 hover:-translate-y-2">
-            <div className="text-lg">{draggingCard.type}</div>
-            <div className="mt-2">{draggingCard.content}</div>
-          </div>
-        ) : null}
-      </DragOverlay>
+      {cardToDelete && (
+        <DeleteCardModal
+          card={cardToDelete}
+          onClose={() => {
+            setCardToDelete(null)
+            setShowCards(true)
+          }}
+        />
+      )}
     </DndContext>
   )
 }

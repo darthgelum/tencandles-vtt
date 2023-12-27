@@ -32,7 +32,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   ])
 
   function addCard(card: Card) {
-    setCards((prevState) => [card, ...prevState])
+    setCards((prevState) => [...prevState, card])
   }
 
   function removeCard(cardId: string) {
