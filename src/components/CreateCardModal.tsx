@@ -8,13 +8,18 @@ type Props = {
 }
 
 export default function CreateCardModal({ onClose }: Props) {
-  const { addCard } = useUser()
+  const { addCard, cards } = useUser()
   const [type, setType] = useState<CardType | string>("")
   const [content, setContent] = useState<string>("")
 
   function handleCreate() {
     addCard({ id: nanoid(), type: type as CardType, content })
     onClose()
+  }
+
+  function isOptionDisabled(cardType) {
+    if (cardType === CardType.Vice || cardType === CardType.Virtue) return false
+    return cards.some((c) => c.type === cardType)
   }
 
   return (
@@ -29,9 +34,9 @@ export default function CreateCardModal({ onClose }: Props) {
           <option value="" disabled>
             Select a card type
           </option>
-          {Object.keys(CardType).map((ct) => (
-            <option key={ct} value={ct}>
-              {ct}
+          {Object.keys(CardType).map((cardType) => (
+            <option key={cardType} value={cardType} disabled={isOptionDisabled(cardType)}>
+              {cardType}
             </option>
           ))}
         </select>

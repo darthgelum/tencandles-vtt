@@ -91,7 +91,7 @@ export default function UI() {
               </div>
             )}
             <div className="">{draggingCard.type}</div>
-            <div className="text-sm mt-2">{draggingCard.content}</div>
+            <div className="text-sm mt-3">{draggingCard.content}</div>
           </div>
         ) : null}
       </DragOverlay>

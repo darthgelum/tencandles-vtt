@@ -39,7 +39,9 @@ export default function Lobby({ room }: { room?: string }) {
 
   const text = room ? null : (
     <p>
-      Since you are creating a new room, you will be the <span className="font-bold">GM</span>.
+      Since you are creating a new room,
+      <br />
+      you will be the <span className="font-bold">GM</span>.
     </p>
   )
 
