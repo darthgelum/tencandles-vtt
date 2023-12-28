@@ -5,6 +5,7 @@ import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
+import { TbLock, TbLockOpen, TbX } from "react-icons/tb"
 import User from "types/User"
 import { useUser } from "context/UserContext"
 import { getCardClasses, getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
@@ -13,18 +14,16 @@ import Card from "types/Card"
 import UserDroppable from "./UserDroppable"
 import CardDraggable from "./CardDraggable"
 import DeleteCardModal from "./DeleteCardModal"
-import { TbX } from "react-icons/tb"
 import CardType from "enums/CardType"
 
 export default function UI() {
-  const { user, cards, addCard, removeCard, setCards } = useUser()
+  const { user, cards, addCard, removeCard, setCards, areCardsLocked } = useUser()
   const { room } = useParams()
 
   const [users, setUsers] = useState<User[]>([])
   const [showCreateCardModal, setShowCreateCardModal] = useState(false)
   const [showCards, setShowCards] = useState(false)
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
-  const [isDraggingCardOverUser, setIsDraggingCardOverUser] = useState(false)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
 
   useEffect(() => {
@@ -48,23 +47,14 @@ export default function UI() {
     })
 
     return () => {
-      socket.removeAllListeners()
+      socket.removeAllListeners("usersUpdated")
+      socket.removeAllListeners("cardTransferred")
     }
-  }, [addCard, user])
-
-  function handleCardDragMove(event: DragEndEvent) {
-    // console.log(event.collisions)
-    // console.log(event.over)
-    if (event.over?.data.current?.user) {
-      setIsDraggingCardOverUser(true)
-    } else if (isDraggingCardOverUser) {
-      setIsDraggingCardOverUser(false)
-    }
-  }
+  })
 
   function handleCardDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    if (!over) return
+    if (!over || areCardsLocked) return
 
     if (over.data.current?.card) {
       // dragged onto another card
@@ -88,7 +78,6 @@ export default function UI() {
   return (
     <DndContext
       onDragStart={(e) => setDraggingCard(e.active.data.current?.card || null)}
-      onDragMove={handleCardDragMove}
       onDragEnd={handleCardDragEnd}
       autoScroll={false}
       collisionDetection={prioritizeUserCollisions}
@@ -96,9 +85,11 @@ export default function UI() {
       <DragOverlay>
         {draggingCard ? (
           <div className={getCardClasses(draggingCard.type)}>
-            <div className="absolute top-3 right-3">
-              <TbX className="h-6 w-6" />
-            </div>
+            {!areCardsLocked && (
+              <div className="absolute top-3 right-3">
+                <TbX className="h-6 w-6" />
+              </div>
+            )}
             <div className="">{draggingCard.type}</div>
             <div className="text-sm mt-2">{draggingCard.content}</div>
           </div>
@@ -131,26 +122,29 @@ export default function UI() {
                     <div
                       className={clsx(getCardClasses(CardType.Character), cards.length === 1 ? "" : "-mt-48", "z-50")}
                     >
-                      <div
-                        className="absolute top-3 right-3 hover:text-red"
-                        onClick={() => {
-                          setCardToDelete(characterCard)
-                          setShowCards(false)
-                        }}
-                      >
-                        <TbX className="h-6 w-6" />
-                      </div>
+                      {!areCardsLocked && (
+                        <div
+                          className="absolute top-3 right-3 hover:text-red"
+                          onClick={() => {
+                            setCardToDelete(characterCard)
+                            setShowCards(false)
+                          }}
+                        >
+                          <TbX className="h-6 w-6" />
+                        </div>
+                      )}
                       <div className="">{CardType.Character}</div>
                       <div className="text-sm mt-2">{characterCard.content}</div>
                     </div>
                   )}
-                  <div className=" z-50">
+                  <div className={clsx(!characterCard && "-mt-28", "z-50")}>
                     {cards
                       .filter((c) => c.type !== CardType.Character)
                       .map((card) => (
                         <CardDraggable
                           key={card.id}
                           card={card}
+                          areCardsLocked={areCardsLocked}
                           onDelete={() => {
                             setCardToDelete(card)
                             setShowCards(false)
@@ -162,15 +156,26 @@ export default function UI() {
               )}
             </>
           )}
-          <button
-            className="absolute top-2 right-2 z-50 text-black bg-yellow p-3 hover:brightness-110"
-            onClick={() => {
-              setShowCards(false)
-              setShowCreateCardModal(true)
-            }}
-          >
-            Add Card
-          </button>
+          <div className="absolute top-2 right-2 z-50 flex items-center gap-3">
+            <button
+              className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
+              disabled={areCardsLocked}
+              onClick={() => {
+                setShowCards(false)
+                setShowCreateCardModal(true)
+              }}
+            >
+              Add Card
+            </button>
+            {user?.isGm && (
+              <button
+                onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}
+                className="text-yellow hover:brightness-110"
+              >
+                {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
+              </button>
+            )}
+          </div>
           {/* users */}
           {users.map((u, i) => (
             <UserDroppable

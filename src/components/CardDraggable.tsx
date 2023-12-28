@@ -8,7 +8,13 @@ import { getCardClasses } from "utils/helpers"
 
 const xShift = 40
 
-export default function CardDraggable({ card, onDelete }: { card: Card; onDelete: () => void }) {
+type Props = {
+  card: Card
+  areCardsLocked: boolean
+  onDelete: () => void
+}
+
+export default function CardDraggable({ card, areCardsLocked, onDelete }: Props) {
   const [isDragDisabled, setIsDragDisabled] = useState(false)
 
   const {
@@ -50,19 +56,22 @@ export default function CardDraggable({ card, onDelete }: { card: Card; onDelete
       className={clsx(
         isSorting && "opacity-70",
         isDragging && "!opacity-0",
+        areCardsLocked ? "hover:z-[999]" : "hover:-translate-y-2",
         getCardClasses(card.type),
-        "mb-[-168px] translate-y-0 hover:-translate-y-2"
+        "mb-[-168px] translate-y-0"
       )}
     >
-      <button
-        className="absolute top-3 right-3 hover:text-red"
-        onClick={onDelete}
-        // this prevents clicking delete button from starting drag
-        onMouseEnter={() => setIsDragDisabled(true)}
-        onMouseLeave={() => setIsDragDisabled(false)}
-      >
-        <TbX className="h-6 w-6" />
-      </button>
+      {!areCardsLocked && (
+        <button
+          className="absolute top-3 right-3 hover:text-red"
+          onClick={onDelete}
+          // this prevents clicking delete button from starting drag
+          onMouseEnter={() => setIsDragDisabled(true)}
+          onMouseLeave={() => setIsDragDisabled(false)}
+        >
+          <TbX className="h-6 w-6" />
+        </button>
+      )}
       <div className="">{card.type}</div>
       <div className="mt-3 text-sm">{card.content}</div>
     </div>

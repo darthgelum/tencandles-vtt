@@ -14,7 +14,7 @@ import Lobby from "./Lobby"
 import UI from "./UI"
 
 export default function Room() {
-  const { user, cards } = useUser()
+  const { user } = useUser()
   const { room } = useParams()
 
   const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
@@ -59,6 +59,10 @@ export default function Room() {
   }, [room, user])
 
   useEffect(() => {
+    socket.on("usersUpdated", () => {
+      if (user!.isGm) socket.emit("passInitialDicePoolsAndCandles", { room, dicePools, candles })
+    })
+
     socket.on("passedInitialDicePoolsAndCandles", ({ dicePools: _dicePools, candles: _candles }) => {
       setDicePools(_dicePools)
       setCandles(_candles)
@@ -103,11 +107,15 @@ export default function Room() {
     })
 
     return () => {
-      socket.removeAllListeners()
+      socket.removeAllListeners("passedInitialDicePoolsAndCandles")
+      socket.removeAllListeners("candleChanged")
+      socket.removeAllListeners("rolled")
+      socket.removeAllListeners("dieDragStarted")
+      socket.removeAllListeners("dieDragEnded")
     }
     // for some reason we need to rerun this useeffect when cards is updated
     // or else the socket will be lost after cards is updated
-  }, [candles, dicePools, room, transferDieToNewPool, user, cards])
+  })
 
   if (!user) {
     return <Lobby room={room} />
@@ -188,7 +196,7 @@ export default function Room() {
               dicePool={DicePool.GM}
               dice={dicePools[DicePool.GM]}
               draggingDice={draggingDice}
-              showRollButton={!user.isGm}
+              showRollButton={user.isGm}
               onRoll={() => handleRoll(DicePool.GM)}
               moreClasses="p-2 pb-0 h-[50%]"
             />

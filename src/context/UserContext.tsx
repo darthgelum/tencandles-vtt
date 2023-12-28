@@ -1,19 +1,18 @@
 "use client"
 
-import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from "react"
+import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction, useEffect } from "react"
+import toast from "react-hot-toast"
 import Card from "types/Card"
 import User from "types/User"
+import socket from "utils/socket"
 
 const UserContext = createContext<ProviderValue | undefined>(undefined)
 
 type ProviderValue = {
-  // username: string
-  // setUsername: Dispatch<SetStateAction<string>>
-  // isGm: boolean
   user?: User
   setUser: Dispatch<SetStateAction<User | undefined>>
-  // setIsGm: Dispatch<SetStateAction<boolean>>
   cards: Card[]
+  areCardsLocked: boolean
   setCards: Dispatch<SetStateAction<Card[]>>
   addCard: (card: Card) => void
   removeCard: (cardId: string) => void
@@ -21,25 +20,31 @@ type ProviderValue = {
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>()
-  // const [username, setUsername] = useState<string>("")
-  // const [isGm, setIsGm] = useState(false)
-  const [cards, setCards] = useState<Card[]>([
-    // { id: "1", type: "Virtue", content: "" },
-    // { id: "2", type: "Virtue", content: "" },
-    // { id: "3", type: "Virtue", content: "" },
-    // { id: "4", type: "Virtue", content: "" },
-    // { id: "5", type: "Virtue", content: "" },
-  ])
+  const [cards, setCards] = useState<Card[]>([])
+  const [areCardsLocked, setAreCardsLocked] = useState(false)
 
-  function addCard(card: Card) {
-    setCards((prevState) => [...prevState, card])
-  }
+  useEffect(() => {
+    socket.on("lockChanged", (isLocked) => {
+      setAreCardsLocked(isLocked)
+      toast(isLocked ? "Cards are now locked." : "Cards are now unlocked.")
+    })
+    return () => {
+      socket.removeAllListeners("lockChanged")
+    }
+  })
 
-  function removeCard(cardId: string) {
-    setCards((prevState) => prevState.filter((card) => card.id !== cardId))
-  }
-
-  const providerValue = useMemo(() => ({ user, setUser, cards, setCards, addCard, removeCard }), [user, cards])
+  const providerValue = useMemo(
+    () => ({
+      user,
+      setUser,
+      cards,
+      areCardsLocked,
+      setCards,
+      addCard: (card: Card) => setCards((prevState) => [...prevState, card]),
+      removeCard: (cardId: string) => setCards((prevState) => prevState.filter((card) => card.id !== cardId)),
+    }),
+    [user, cards, areCardsLocked]
+  )
 
   return <UserContext.Provider value={providerValue}>{children}</UserContext.Provider>
 }
