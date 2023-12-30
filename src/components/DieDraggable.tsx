@@ -45,10 +45,10 @@ export default function DieDraggable({
   } else {
     colorClasses =
       die.num === 6
-        ? "text-green border-green bg-darkgrey"
+        ? "text-yellow border-yellow bg-darkgrey"
         : die.num === 1
         ? "text-red border-red bg-darkgrey"
-        : "text-yellow border-yellow bg-darkgrey"
+        : "text-orange border-orange bg-darkgrey"
   }
 
   return (

@@ -29,14 +29,14 @@ export default function DicePoolDroppable({
   const hopeDie = dice.find((d) => d.id === HOPE_DIE_ID)
 
   return (
-    <div ref={setNodeRef} className={clsx(isOver && "bg-yellowTransparent", moreClasses)}>
+    <div ref={setNodeRef} className={clsx(isOver && "bg-orangeTransparent", moreClasses)}>
       <div className="flex items-center justify-center gap-4">
         <h2 className="text-center text-lg">{dicePool}</h2>
         {showRollButton && (
           <button
             onClick={onRoll}
             disabled={dice.length === 0}
-            className="bg-yellow text-darkgrey text-lg px-4 pb-3 pt-2.5 hover:brightness-[110%]"
+            className="bg-yellow text-black text-lg px-4 pb-3 pt-2.5 hover:brightness-[110%]"
           >
             Roll
           </button>
