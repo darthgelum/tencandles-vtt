@@ -15,6 +15,7 @@ import UserDroppable from "./UserDroppable"
 import CardDraggable from "./CardDraggable"
 import DeleteCardModal from "./DeleteCardModal"
 import CardType from "enums/CardType"
+import CandleModal from "./CandleModal"
 
 type UserIdToCards = { userId: string; cards: Card[] }
 
@@ -241,6 +242,7 @@ export default function UI() {
           }}
         />
       )}
+      {showCandleModal && <CandleModal onClose={() => setShowCandleModal()} />}
     </DndContext>
   )
 }

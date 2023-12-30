@@ -154,8 +154,13 @@ export default function Room() {
     socket.emit("roll", { dicePool, diceCount: dicePools[dicePool].length, username: user!.name, room })
   }
 
-  function handleCandleToggle(index) {
-    socket.emit("candleChange", { index, isLit: !candles[index], username: user!.name, room })
+  function handleCandleToggle(index, override?) {
+    socket.emit("candleChange", {
+      index,
+      isLit: override === undefined ? !candles[index] : override,
+      username: user!.name,
+      room,
+    })
   }
 
   const litCandleCount = candles.filter((c) => c).length
@@ -175,9 +180,9 @@ export default function Room() {
         className="pointer-events-none bg-[#000000] w-screen h-screen fixed"
       />
       {/* candles */}
-      <div className="relative w-full h-full scale-75 mb-10 z-20 rounded-[100%]">
+      <div className="relative w-full h-full scale-75 mb-10 z-10 rounded-[100%]">
         {candles.map((isLit, i) => (
-          <Candle key={i} index={i} isLit={isLit} onToggle={() => handleCandleToggle(i)} />
+          <Candle key={i} index={i} isLit={isLit} onToggle={(override) => handleCandleToggle(i, override)} />
         ))}
       </div>
       {/* dice */}

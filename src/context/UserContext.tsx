@@ -10,11 +10,14 @@ type ProviderValue = {
   setUser: Dispatch<SetStateAction<User | undefined>>
   areCardsLocked: boolean
   setAreCardsLocked: Dispatch<SetStateAction<boolean>>
+  candleLifetime: number
+  setCandleLifetime: Dispatch<SetStateAction<number>>
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>()
   const [areCardsLocked, setAreCardsLocked] = useState(false)
+  const [candleLifetime, setCandleLifetime] = useState(14400) // 4 hours in seconds
 
   const providerValue = useMemo(
     () => ({
@@ -22,8 +25,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setUser,
       areCardsLocked,
       setAreCardsLocked,
+      candleLifetime,
+      setCandleLifetime,
     }),
-    [areCardsLocked, user]
+    [areCardsLocked, candleLifetime, user]
   )
 
   return <UserContext.Provider value={providerValue}>{children}</UserContext.Provider>
