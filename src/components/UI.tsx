@@ -5,7 +5,7 @@ import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
-import { TbLock, TbLockOpen, TbX } from "react-icons/tb"
+import { TbFlame, TbLock, TbLockOpen, TbX } from "react-icons/tb"
 import User from "types/User"
 import { useUser } from "context/UserContext"
 import { getCardClasses, getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
@@ -19,17 +19,17 @@ import CardType from "enums/CardType"
 type UserIdToCards = { userId: string; cards: Card[] }
 
 export default function UI() {
-  const { user } = useUser()
+  const { user, areCardsLocked, setAreCardsLocked } = useUser()
   const { room } = useParams()
 
   const [users, setUsers] = useState<User[]>([])
   const [cards, setCards] = useState<Card[]>([])
   const [peerUserCards, setPeerUserCards] = useState<UserIdToCards>()
-  const [areCardsLocked, setAreCardsLocked] = useState(false)
   const [showCreateCardModal, setShowCreateCardModal] = useState(false)
   const [showCards, setShowCards] = useState(false)
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
+  const [showCandleModal, setShowCandleModal] = useState(false)
 
   useEffect(() => {
     socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
@@ -189,6 +189,19 @@ export default function UI() {
             </>
           )}
           <div className="absolute top-2 right-2 z-50 flex items-center gap-3">
+            {user?.isGm && (
+              <>
+                <button
+                  onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}
+                  className="text-yellow hover:brightness-110"
+                >
+                  {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
+                </button>
+                <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110 mr-2">
+                  <TbFlame className="h-12 w-12" />
+                </button>
+              </>
+            )}
             <button
               className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
               disabled={areCardsLocked}
@@ -199,14 +212,6 @@ export default function UI() {
             >
               Add Card
             </button>
-            {user?.isGm && (
-              <button
-                onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}
-                className="text-yellow hover:brightness-110"
-              >
-                {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
-              </button>
-            )}
           </div>
           {/* users */}
           {users.map((u, i) => (

@@ -8,17 +8,22 @@ const UserContext = createContext<ProviderValue | undefined>(undefined)
 type ProviderValue = {
   user?: User
   setUser: Dispatch<SetStateAction<User | undefined>>
+  areCardsLocked: boolean
+  setAreCardsLocked: Dispatch<SetStateAction<boolean>>
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>()
+  const [areCardsLocked, setAreCardsLocked] = useState(false)
 
   const providerValue = useMemo(
     () => ({
       user,
       setUser,
+      areCardsLocked,
+      setAreCardsLocked,
     }),
-    [user]
+    [areCardsLocked, user]
   )
 
   return <UserContext.Provider value={providerValue}>{children}</UserContext.Provider>

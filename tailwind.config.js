@@ -15,7 +15,7 @@ export default {
         green: "#609350",
         lightblue: "#6ed8e0",
         blue: "#306695",
-        brown: "#412618",
+        brown: "#7a4e1d",
         orangeTransparent: "rgb(240, 130, 75, 0.3)",
       },
       screens: {

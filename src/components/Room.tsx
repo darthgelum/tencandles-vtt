@@ -14,7 +14,7 @@ import Lobby from "./Lobby"
 import UI from "./UI"
 
 export default function Room() {
-  const { user } = useUser()
+  const { user, areCardsLocked } = useUser()
   const { room } = useParams()
 
   const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
@@ -158,15 +158,11 @@ export default function Room() {
     socket.emit("candleChange", { index, isLit: !candles[index], username: user!.name, room })
   }
 
+  const litCandleCount = candles.filter((c) => c).length
+  const darknessOpacity = areCardsLocked ? 0.8 - (litCandleCount * 1) / 12.5 : 0
+
   return (
     <>
-      {/* table */}
-      {/* <div
-        className="bg-[length:250px] absolute w-[105%] h-[105%] rounded-[100%]"
-        style={{
-          background: "radial-gradient(ellipse at center, rgba(255, 207, 74, 1) 0%, rgba(255, 207, 74, 0) 67%",
-        }}
-      /> */}
       <div
         className="bg-[url('/wood.png')] bg-[length:250px] absolute w-full h-full rounded-[100%] shadow-[0_0_50px_70px_rgba(16,16,15,1)_inset] outline outline-black"
         style={{ imageRendering: "pixelated" }}
@@ -174,8 +170,12 @@ export default function Room() {
       <p className="absolute top-1 left-2 text-xs text-lightgrey">
         To invite players to join this room, send them this page’s URL.
       </p>
+      <div
+        style={{ opacity: `${darknessOpacity}` }}
+        className="pointer-events-none bg-[#000000] w-screen h-screen fixed"
+      />
       {/* candles */}
-      <div className="relative w-full h-full scale-75 mb-10 z-10 rounded-[100%]">
+      <div className="relative w-full h-full scale-75 mb-10 z-20 rounded-[100%]">
         {candles.map((isLit, i) => (
           <Candle key={i} index={i} isLit={isLit} onToggle={() => handleCandleToggle(i)} />
         ))}
@@ -190,7 +190,7 @@ export default function Room() {
               draggingDice={draggingDice}
               showRollButton={!user.isGm}
               onRoll={() => handleRoll(DicePool.Player)}
-              moreClasses="p-2 pt-0 h-[50%] border-b-6 border-black"
+              moreClasses="p-2 pt-0 h-[50%] border-b-6 border-brown"
             />
             <DicePoolDroppable
               dicePool={DicePool.GM}
@@ -205,7 +205,7 @@ export default function Room() {
             dicePool={DicePool.Stash}
             dice={dicePools[DicePool.Stash]}
             draggingDice={draggingDice}
-            moreClasses="p-2 my-12 border-l-6 border-black"
+            moreClasses="p-2 my-12 border-l-6 border-brown"
           />
         </div>
       </DndContext>
