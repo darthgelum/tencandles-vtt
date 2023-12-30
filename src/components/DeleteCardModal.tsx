@@ -1,21 +1,14 @@
 import { TbX } from "react-icons/tb"
 import Card from "types/Card"
-import { useUser } from "context/UserContext"
 import { getCardClasses } from "utils/helpers"
 
 type Props = {
   card: Card
-  onClose: () => void
+  onDelete: () => void
+  onCancel: () => void
 }
 
-export default function DeleteCardModal({ card, onClose }: Props) {
-  const { removeCard } = useUser()
-
-  function handleDelete() {
-    removeCard(card.id)
-    onClose()
-  }
-
+export default function DeleteCardModal({ card, onDelete, onCancel }: Props) {
   return (
     <>
       <div className="h-screen w-screen fixed bg-black opacity-70 z-50" />
@@ -29,12 +22,12 @@ export default function DeleteCardModal({ card, onClose }: Props) {
           <div className="mt-3 text-sm">{card.content}</div>
         </div>
         <div className="flex gap-4 text-base">
-          <button className="" onClick={onClose}>
+          <button className="" onClick={onCancel}>
             Cancel
           </button>
           <button
-            className="px-3 py-2 bg-red text-white hover:brightness-125 disabled:opacity-60 disabled:hover:brightness-100"
-            onClick={handleDelete}
+            className="px-4 py-2 bg-red text-white hover:brightness-125 disabled:opacity-60 disabled:hover:brightness-100"
+            onClick={onDelete}
           >
             Yes
           </button>

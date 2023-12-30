@@ -160,7 +160,7 @@ export default function Room() {
 
   return (
     <>
-      <p className="absolute top-1 w-full text-center text-xs text-lightgrey">
+      <p className="absolute top-1 left-2 text-xs text-lightgrey">
         To invite players to join this room, send them this page’s URL.
       </p>
       {/* table */}

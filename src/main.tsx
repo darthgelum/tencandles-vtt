@@ -36,7 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Toaster
       position="bottom-right"
       toastOptions={{
-        className: "!bg-[rgba(60,60,60)] !text-white !p-4 !max-w-full",
+        className: "!bg-[rgba(60,60,60)] !text-white !p-4 !max-w-full leading-relaxed",
         duration: 2000,
       }}
     >

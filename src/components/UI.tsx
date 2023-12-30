@@ -16,11 +16,16 @@ import CardDraggable from "./CardDraggable"
 import DeleteCardModal from "./DeleteCardModal"
 import CardType from "enums/CardType"
 
+type UserIdToCards = { userId: string; cards: Card[] }
+
 export default function UI() {
-  const { user, cards, addCard, removeCard, setCards, areCardsLocked } = useUser()
+  const { user } = useUser()
   const { room } = useParams()
 
   const [users, setUsers] = useState<User[]>([])
+  const [cards, setCards] = useState<Card[]>([])
+  const [peerUserCards, setPeerUserCards] = useState<UserIdToCards>()
+  const [areCardsLocked, setAreCardsLocked] = useState(false)
   const [showCreateCardModal, setShowCreateCardModal] = useState(false)
   const [showCards, setShowCards] = useState(false)
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
@@ -39,16 +44,41 @@ export default function UI() {
       setUsers(reorderedUsers)
 
       if (toastText) toast(toastText)
+
+      // if (user!.isGm) socket.emit("passInitialPeerUserCards", { room, dicePools, candles })
     })
 
     socket.on("cardTransferred", ({ newUsername, oldUsername, card }) => {
-      if (newUsername === user!.name) addCard(card)
+      if (newUsername === user!.name) {
+        setCards((prevState) => [...prevState, card])
+      }
       toast(`${oldUsername} gave a ${card.type} to ${newUsername}`)
+    })
+
+    socket.on("lockChanged", (isLocked) => {
+      setAreCardsLocked(isLocked)
+      toast(
+        isLocked
+          ? "Cards are now locked.\nMouse over a user to see the top card on their stack."
+          : "Cards are now unlocked.",
+        { duration: isLocked ? 6000 : undefined }
+      )
+
+      if (isLocked) socket.emit("updatePeerUserCards", { room, userId: user!.id, cards })
+    })
+
+    socket.on("peerUserCardsUpdated", ({ userId, cards: _cards }) => {
+      setPeerUserCards((prevState) => {
+        const newState = prevState ? { ...prevState } : ({} as UserIdToCards)
+        newState[userId] = _cards
+        return newState
+      })
     })
 
     return () => {
       socket.removeAllListeners("usersUpdated")
       socket.removeAllListeners("cardTransferred")
+      socket.removeAllListeners("lockChanged")
     }
   })
 
@@ -68,7 +98,7 @@ export default function UI() {
     } else if (over.data.current?.user && over.data.current?.user.id !== user!.id) {
       // dragged onto another user
       const card = cards.find((c) => c.id === active.id)
-      removeCard(active.id as string)
+      setCards((prevState) => prevState.filter((c) => c.id !== active.id))
       socket.emit("transferCard", { newUsername: over.data.current?.user.name, oldUsername: user!.name, room, card })
     }
   }
@@ -99,6 +129,8 @@ export default function UI() {
         <div className="absolute w-screen h-screen flex justify-center items-center overflow-hidden">
           {showCreateCardModal && (
             <CreateCardModal
+              cards={cards}
+              addCard={(card) => setCards((prevState) => [...prevState, card])}
               onClose={() => {
                 setShowCreateCardModal(false)
                 setShowCards(true)
@@ -181,6 +213,8 @@ export default function UI() {
             <UserDroppable
               key={u.id}
               user={u}
+              cards={peerUserCards?.[u.id]}
+              areCardsLocked={areCardsLocked}
               isThisUser={u.name === user!.name}
               onOpenCardStack={() => setShowCards(true)}
               moreClasses={getUserPositionClasses(i, users.length)}
@@ -191,7 +225,12 @@ export default function UI() {
       {cardToDelete && (
         <DeleteCardModal
           card={cardToDelete}
-          onClose={() => {
+          onDelete={() => {
+            setCards((prevState) => prevState.filter((card) => card.id !== cardToDelete.id))
+            setCardToDelete(null)
+            setShowCards(true)
+          }}
+          onCancel={() => {
             setCardToDelete(null)
             setShowCards(true)
           }}

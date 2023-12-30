@@ -1,14 +1,15 @@
 import { useState } from "react"
 import { nanoid } from "nanoid"
 import CardType from "enums/CardType"
-import { useUser } from "context/UserContext"
+import Card from "types/Card"
 
 type Props = {
+  cards: Card[]
+  addCard: (card: Card) => void
   onClose: () => void
 }
 
-export default function CreateCardModal({ onClose }: Props) {
-  const { addCard, cards } = useUser()
+export default function CreateCardModal({ cards, addCard, onClose }: Props) {
   const [type, setType] = useState<CardType | string>("")
   const [content, setContent] = useState<string>("")
 
