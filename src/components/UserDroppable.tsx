@@ -79,8 +79,18 @@ export default function UserDroppable({
             )}
             {topCardInStack && (
               <div className={clsx(getCardClasses(topCardInStack.type), "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
-                <div>{topCardInStack.type}</div>
-                <div className="text-sm mt-3">{topCardInStack.content}</div>
+                {topCardInStack.type === CardType.Brink ? (
+                  <div className="flex justify-center items-center text-center w-full h-full">
+                    {CardType.Brink}
+                    <br />
+                    (hidden)
+                  </div>
+                ) : (
+                  <>
+                    <div>{topCardInStack.type}</div>
+                    <div className="text-sm mt-3">{topCardInStack.content}</div>
+                  </>
+                )}
               </div>
             )}
           </div>
