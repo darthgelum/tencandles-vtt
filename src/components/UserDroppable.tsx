@@ -52,7 +52,8 @@ export default function UserDroppable({
           className={clsx(
             isThisUser && "hover:bg-yellow hover:text-black",
             isOver && "scale-125",
-            "text-yellow h-fit w-fit p-3 border-2 border-yellow",
+            isThisUser && "this-user",
+            "user text-yellow h-fit w-fit p-3 border-2 border-yellow bg-black",
             moreClasses
           )}
           onClick={handleClick}

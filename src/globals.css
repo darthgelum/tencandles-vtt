@@ -15,3 +15,15 @@ html {
 #root {
   @apply bg-black font-pixel text-white h-screen w-screen flex justify-center items-center overflow-hidden;
 }
+
+:root {
+  --reactour-accent: theme("colors.yellow");
+}
+
+.reactour__popover {
+  @apply !bg-grey !p-5 !max-w-[400px] border-4 border-yellow;
+}
+
+.reactour__close-button {
+  @apply !top-[18px] !right-[18px];
+}

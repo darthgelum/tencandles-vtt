@@ -15,7 +15,7 @@ function CardUi({ card, onDelete = () => {}, moreClasses, moreProps }: Props, re
     <div
       ref={ref}
       className={clsx(
-        "px-4 py-3 bg-yellow w-[400px] h-[240px] text-black shadow-[0px_0px_20px_5px_rgba(0,0,0,0.15)] mb-[-198px] translate-y-0 hover:-translate-y-2",
+        "card px-4 py-3 bg-yellow w-[400px] h-[240px] text-black shadow-[0px_0px_20px_5px_rgba(0,0,0,0.15)] mb-[-198px] translate-y-0 hover:-translate-y-2",
         moreClasses
       )}
       {...moreProps}

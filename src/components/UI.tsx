@@ -16,13 +16,17 @@ import CardDraggable from "./CardDraggable"
 import DeleteCardModal from "./DeleteCardModal"
 import CardType from "enums/CardType"
 import CandleModal from "./CandleModal"
+import OnboardingStage from "enums/OnboardingStage"
+import { useOnboarding } from "context/OnboardingContext"
 
 type UserIdToCards = { userId: string; cards: Card[] }
 
 export default function UI() {
+  const { isOnboardingOpen, setIsOnboardingOpen, currentOnboardingStage, startOnboardingStage } = useOnboarding()
+
   const { user, areCardsLocked, setAreCardsLocked } = useUser()
   const { room } = useParams()
-
+  console.log("currentOnboardingStage", currentOnboardingStage)
   const [users, setUsers] = useState<User[]>([])
   const [cards, setCards] = useState<Card[]>([])
   const [peerUserCards, setPeerUserCards] = useState<UserIdToCards>()
@@ -31,6 +35,32 @@ export default function UI() {
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
   const [showCandleModal, setShowCandleModal] = useState(false)
+
+  useEffect(() => {
+    if (
+      currentOnboardingStage === OnboardingStage.Table &&
+      !isOnboardingOpen &&
+      cards.length === 1 &&
+      cards[0].type !== CardType.Character
+    ) {
+      startOnboardingStage(OnboardingStage.SingleCard)
+    } else if (
+      showCards &&
+      currentOnboardingStage === OnboardingStage.SingleCard &&
+      !isOnboardingOpen &&
+      cards.filter((c) => c.type !== CardType.Character).length > 1
+    ) {
+      startOnboardingStage(OnboardingStage.MultipleCards)
+    }
+  }, [cards, currentOnboardingStage, isOnboardingOpen, setIsOnboardingOpen, showCards, startOnboardingStage])
+
+  useEffect(() => {
+    function onKeyUp(e: KeyboardEvent) {
+      if (e.key === "Escape") setShowCards(false)
+    }
+    window.addEventListener("keyup", onKeyUp)
+    return () => window.removeEventListener("keyup", onKeyUp)
+  }, [])
 
   useEffect(() => {
     socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
@@ -87,6 +117,10 @@ export default function UI() {
     const { active, over } = event
     if (!over || areCardsLocked) return
 
+    if (isOnboardingOpen && currentOnboardingStage === OnboardingStage.MultipleCards) {
+      setIsOnboardingOpen(false)
+    }
+
     if (over.data.current?.card) {
       // dragged onto another card
       if (active.id !== over.id) {
@@ -108,7 +142,12 @@ export default function UI() {
 
   return (
     <DndContext
-      onDragStart={(e) => setDraggingCard(e.active.data.current?.card || null)}
+      onDragStart={(e) => {
+        setDraggingCard(e.active.data.current?.card || null)
+        if (isOnboardingOpen && currentOnboardingStage === OnboardingStage.SingleCard) {
+          setIsOnboardingOpen(false)
+        }
+      }}
       onDragEnd={handleCardDragEnd}
       autoScroll={false}
       collisionDetection={prioritizeUserCollisions}
@@ -153,7 +192,11 @@ export default function UI() {
                 <div className={clsx(characterCard && cards.length > 1 && "gap-24", "flex")}>
                   {characterCard && (
                     <div
-                      className={clsx(getCardClasses(CardType.Character), cards.length === 1 ? "" : "-mt-48", "z-50")}
+                      className={clsx(
+                        getCardClasses(CardType.Character),
+                        cards.length === 1 ? "" : "-mt-48",
+                        "card_character z-50"
+                      )}
                     >
                       {!areCardsLocked && (
                         <div
@@ -170,7 +213,7 @@ export default function UI() {
                       <div className="text-sm mt-2">{characterCard.content}</div>
                     </div>
                   )}
-                  <div className={clsx(!characterCard && "-mt-28", "z-50")}>
+                  <div className={clsx(!characterCard && "-mt-28", "card-stack z-50")}>
                     {cards
                       .filter((c) => c.type !== CardType.Character)
                       .map((card) => (
@@ -222,7 +265,12 @@ export default function UI() {
               cards={peerUserCards?.[u.id]}
               areCardsLocked={areCardsLocked}
               isThisUser={u.name === user!.name}
-              onOpenCardStack={() => setShowCards(true)}
+              onOpenCardStack={() => {
+                setShowCards(true)
+                if (isOnboardingOpen && currentOnboardingStage === OnboardingStage.Table) {
+                  setIsOnboardingOpen(false)
+                }
+              }}
               moreClasses={getUserPositionClasses(i, users.length)}
             />
           ))}
@@ -242,7 +290,7 @@ export default function UI() {
           }}
         />
       )}
-      {showCandleModal && <CandleModal onClose={() => setShowCandleModal()} />}
+      {showCandleModal && <CandleModal onClose={() => setShowCandleModal(false)} />}
     </DndContext>
   )
 }

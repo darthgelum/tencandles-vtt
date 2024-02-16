@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import { useParams } from "react-router-dom"
+import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core"
 import socket from "utils/socket"
 import Candle from "components/Candle"
 import { useUser } from "context/UserContext"
-import { useParams } from "react-router-dom"
 import { getInitialDice } from "utils/helpers"
-import { DndContext, DragEndEvent, DragStartEvent } from "@dnd-kit/core"
 import DicePoolDroppable from "./DicePoolDroppable"
 import Die from "types/Die"
 import DicePool from "enums/DicePool"
 import { HOPE_DIE_ID } from "utils/constants"
 import Lobby from "./Lobby"
 import UI from "./UI"
+import OnboardingStage from "enums/OnboardingStage"
+import { useOnboarding } from "context/OnboardingContext"
 
 export default function Room() {
   const { user, areCardsLocked } = useUser()
@@ -24,6 +26,14 @@ export default function Room() {
     [DicePool.Stash]: [{ id: HOPE_DIE_ID, num: 1 }],
   })
   const [draggingDice, setDraggingDice] = useState<{ dieId: number; username: string }[]>([])
+
+  const { currentOnboardingStage, setIsOnboardingOpen } = useOnboarding()
+
+  useEffect(() => {
+    if (user && currentOnboardingStage === OnboardingStage.Table) {
+      setIsOnboardingOpen(true)
+    }
+  }, [setIsOnboardingOpen, user, currentOnboardingStage])
 
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
@@ -75,7 +85,7 @@ export default function Room() {
         return newState
       })
       if (username !== user!.name) {
-        toast(`${username} ${isLit ? "lit" : "extinguished"} a candle.`)
+        toast(`${username} ${isLit ? "lit" : "darkened"} a candle.`)
       }
     })
 
@@ -193,9 +203,9 @@ export default function Room() {
               dicePool={DicePool.Player}
               dice={dicePools[DicePool.Player]}
               draggingDice={draggingDice}
-              showRollButton={!user.isGm}
+              showRollButton
               onRoll={() => handleRoll(DicePool.Player)}
-              moreClasses="p-2 pt-0 h-[50%] border-b-6 border-brown"
+              moreClasses="dice-pool_player p-2 pt-0 h-[50%] border-b-6 border-brown"
             />
             <DicePoolDroppable
               dicePool={DicePool.GM}
@@ -203,14 +213,14 @@ export default function Room() {
               draggingDice={draggingDice}
               showRollButton={user.isGm}
               onRoll={() => handleRoll(DicePool.GM)}
-              moreClasses="p-2 pb-0 h-[50%]"
+              moreClasses="dice-pool_gm p-2 pb-0 h-[50%]"
             />
           </div>
           <DicePoolDroppable
             dicePool={DicePool.Stash}
             dice={dicePools[DicePool.Stash]}
             draggingDice={draggingDice}
-            moreClasses="p-2 my-12 border-l-6 border-brown"
+            moreClasses="dice-pool_stash p-2 my-12 border-l-6 border-brown"
           />
         </div>
       </DndContext>

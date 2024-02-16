@@ -7,7 +7,7 @@ export function getCardClasses(cardType: CardType) {
   let backgroundColor = "bg-yellow"
   // if (cardType === CardType.Brink) backgroundColor = "bg-red"
   // if (cardType === CardType.Moment) backgroundColor = "bg-lightblue"
-  return `${backgroundColor} relative px-4 py-3 w-[350px] h-[210px] text-black shadow-[0px_0px_20px_5px_rgba(0,0,0,0.15)]`
+  return `${backgroundColor} card relative px-4 py-3 w-[350px] h-[210px] text-black shadow-[0px_0px_20px_5px_rgba(0,0,0,0.15)]`
 }
 
 export function getInitialDice(): Die[] {

@@ -41,6 +41,7 @@ export default function Candle({ index, isLit, onToggle }) {
 
   return (
     <button onClick={() => onToggle()} className={clsx(positionClasses[index], "absolute w-[128px]")}>
+      {index === 0 && <div className="candle-onboarding p-8 absolute -top-[100px] -left-[26px] w-[180px] h-[180px]" />}
       <div className="rounded-[100%] w-[130px] h-[20px] shadow-[0px_0px_12px_20px_rgba(16,16,15,0.2)] absolute top-[40px] bg-[rgba(16,16,15,0.2)]" />
       <img src="/candle.png" className="absolute inset-0 w-full" style={{ imageRendering: "pixelated" }} />
       {isLit ? (

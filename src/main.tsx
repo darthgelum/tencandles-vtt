@@ -8,6 +8,7 @@ import ErrorPage from "components/ErrorPage"
 import Room from "components/Room"
 import { UserProvider } from "context/UserContext"
 import Test from "components/Test"
+import { OnboardingRootProvider } from "context/OnboardingContext"
 
 const router = createBrowserRouter([
   {
@@ -32,25 +33,27 @@ const fadeOutAnimation = `0%{opacity:1;} 100%{opacity:0;}`
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <UserProvider>
-    <RouterProvider router={router} />
-    <Toaster
-      position="bottom-right"
-      toastOptions={{
-        className: "!bg-[rgba(60,60,60)] !text-white !p-4 !max-w-full leading-relaxed",
-        duration: 2000,
-      }}
-    >
-      {(t) => (
-        <ToastBar
-          toast={t}
-          style={{
-            ...t.style,
-            animation: t.visible
-              ? `${keyframes(slideInAnimation)} 0.35s cubic-bezier(.21,1.02,.73,1) forwards`
-              : `${keyframes(fadeOutAnimation)} 1.5s forwards`,
-          }}
-        />
-      )}
-    </Toaster>
+    <OnboardingRootProvider>
+      <RouterProvider router={router} />
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          className: "!bg-[rgba(60,60,60)] !text-white !p-4 !max-w-full leading-relaxed",
+          duration: 2000,
+        }}
+      >
+        {(t) => (
+          <ToastBar
+            toast={t}
+            style={{
+              ...t.style,
+              animation: t.visible
+                ? `${keyframes(slideInAnimation)} 0.35s cubic-bezier(.21,1.02,.73,1) forwards`
+                : `${keyframes(fadeOutAnimation)} 1.5s forwards`,
+            }}
+          />
+        )}
+      </Toaster>
+    </OnboardingRootProvider>
   </UserProvider>
 )

@@ -15,6 +15,8 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@headlessui/react": "^1.7.17",
     "@hello-pangea/dnd": "^16.3.0",
+    "@reactour/tour": "^3.6.1",
+    "@rehooks/local-storage": "^2.4.5",
     "@tailwindcss/forms": "^0.5.7",
     "clsx": "^2.0.0",
     "goober": "^2.1.13",

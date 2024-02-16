@@ -5,6 +5,7 @@ import clsx from "clsx"
 import { TbX } from "react-icons/tb"
 import Card from "types/Card"
 import { getCardClasses } from "utils/helpers"
+import CardType from "enums/CardType"
 
 const xShift = 40
 
