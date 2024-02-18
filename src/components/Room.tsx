@@ -33,7 +33,7 @@ export default function Room() {
     if (user && currentOnboardingStage === OnboardingStage.Table) {
       setIsOnboardingOpen(true)
     }
-  }, [setIsOnboardingOpen, user, currentOnboardingStage])
+  }, [setIsOnboardingOpen, user?.id, currentOnboardingStage])
 
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
@@ -66,7 +66,7 @@ export default function Room() {
         socket.disconnect()
       }
     }
-  }, [room, user])
+  }, [room, user?.id])
 
   useEffect(() => {
     socket.on("usersUpdated", () => {

@@ -1,6 +1,6 @@
 import { TbX } from "react-icons/tb"
 import Card from "types/Card"
-import { getCardClasses } from "utils/helpers"
+import { CARD_CLASSES } from "utils/constants"
 
 type Props = {
   card: Card
@@ -14,7 +14,7 @@ export default function DeleteCardModal({ card, onDelete, onCancel }: Props) {
       <div className="h-screen w-screen fixed bg-black opacity-70 z-50" />
       <div className="flex flex-col gap-4 justify-center items-center text-white z-50 fixed w-fit h-fit text-lg bg-grey px-8 py-6">
         Are you sure you want to remove this card?
-        <div className={getCardClasses(card.type)}>
+        <div className={CARD_CLASSES}>
           <div className="absolute top-3 right-3">
             <TbX className="h-6 w-6" />
           </div>

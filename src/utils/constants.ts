@@ -2,6 +2,9 @@ import OnboardingStage from "enums/OnboardingStage"
 
 export const HOPE_DIE_ID = 11
 
+export const CARD_CLASSES =
+  "card relative px-4 py-3 w-[350px] h-[210px] text-black shadow-[0px_0px_20px_5px_rgba(0,0,0,0.15)]"
+
 export const ONBOARDING_STORAGE_KEY = "tenCandles_lastCompletedOnboardingStage"
 
 export const ONBOARDING_STEPS = {

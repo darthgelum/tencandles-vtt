@@ -4,8 +4,7 @@ import { CSS } from "@dnd-kit/utilities"
 import clsx from "clsx"
 import { TbX } from "react-icons/tb"
 import Card from "types/Card"
-import { getCardClasses } from "utils/helpers"
-import CardType from "enums/CardType"
+import { CARD_CLASSES } from "utils/constants"
 
 const xShift = 40
 
@@ -58,7 +57,7 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
         isSorting && "opacity-70",
         isDragging && "!opacity-0",
         areCardsLocked ? "hover:z-[999]" : "hover:-translate-y-2",
-        getCardClasses(card.type),
+        CARD_CLASSES,
         "mb-[-168px] translate-y-0"
       )}
     >

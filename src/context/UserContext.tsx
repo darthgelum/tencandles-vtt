@@ -1,7 +1,5 @@
 "use client"
 
-import useLocalStorage from "@rehooks/local-storage"
-import OnboardingStage from "enums/OnboardingStage"
 import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from "react"
 import User from "types/User"
 
@@ -20,7 +18,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>()
   const [areCardsLocked, setAreCardsLocked] = useState(false)
   const [candleLifetime, setCandleLifetime] = useState(14400) // 4 hours in seconds
-  // const [currentOnboardingStage, setCurrentOnboardingStage] = useState<OnboardingStage>(OnboardingStage.Table)
 
   const providerValue = useMemo(
     () => ({

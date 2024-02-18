@@ -4,14 +4,15 @@ import User from "types/User"
 import { useState } from "react"
 import Card from "types/Card"
 import CardType from "enums/CardType"
-import { getCardClasses } from "utils/helpers"
+import { useUser } from "context/UserContext"
+import { CARD_CLASSES } from "utils/constants"
 
 type Props = {
   user: User
   cards?: Card[]
   areCardsLocked: boolean
-  isThisUser: boolean
   onOpenCardStack: () => void
+  onMakeUserGm: () => void
   moreClasses?: string
 }
 
@@ -19,17 +20,15 @@ export default function UserDroppable({
   user,
   cards,
   areCardsLocked,
-  isThisUser,
   onOpenCardStack,
+  onMakeUserGm,
   moreClasses,
 }: Props) {
+  const { user: currentUser } = useUser()
   const { setNodeRef, isOver } = useDroppable({ id: user.id, data: { user } })
   const [showTopCards, setShowTopCards] = useState(false)
 
-  function handleClick() {
-    if (isThisUser) onOpenCardStack()
-  }
-
+  const isCurrentUser = user.id === currentUser!.id
   const characterCard = cards?.find((c) => c.type === CardType.Character)
 
   let topCardInStack: Card | null = null
@@ -44,17 +43,25 @@ export default function UserDroppable({
     }
   }
 
+  function handleClick() {
+    if (isCurrentUser) {
+      onOpenCardStack()
+    } else if (currentUser!.isGm) {
+      onMakeUserGm()
+    }
+  }
+
   return (
     <>
-      <div className={clsx("w-fit text-center absolute z-50 z-[999]", moreClasses)}>
+      <div className={clsx("text-center absolute z-50", moreClasses)}>
         <button
           ref={setNodeRef}
           className={clsx(
-            isThisUser && "hover:bg-yellow hover:text-black",
+            isCurrentUser && "hover:bg-yellow hover:text-black",
             isOver && "scale-125",
-            isThisUser && "this-user",
-            "user text-yellow h-fit w-fit p-3 border-2 border-yellow bg-black",
-            moreClasses
+            currentUser!.isGm || isCurrentUser ? "cursor-pointer" : "cursor-default",
+            isCurrentUser && "this-user",
+            "user text-yellow h-fit w-fit p-3 border-2 border-yellow bg-black"
           )}
           onClick={handleClick}
           onMouseEnter={() => {
@@ -63,7 +70,6 @@ export default function UserDroppable({
           onMouseLeave={() => {
             if (areCardsLocked) setShowTopCards(false)
           }}
-          disabled={!isThisUser}
         >
           {user.name}
         </button>
@@ -73,13 +79,13 @@ export default function UserDroppable({
           {/* <div className="h-screen w-screen fixed bg-black opacity-70 z-50" /> */}
           <div className={clsx(characterCard && topCardInStack && "gap-4", "flex justify-center items-center z-50")}>
             {characterCard && (
-              <div className={clsx(getCardClasses(CardType.Character), "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
+              <div className={clsx(CARD_CLASSES, "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
                 <div>{CardType.Character}</div>
                 <div className="text-sm mt-3">{characterCard.content}</div>
               </div>
             )}
             {topCardInStack && (
-              <div className={clsx(getCardClasses(topCardInStack.type), "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
+              <div className={clsx(CARD_CLASSES, "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
                 {topCardInStack.type === CardType.Brink ? (
                   <div className="flex justify-center items-center text-center w-full h-full">
                     {CardType.Brink}

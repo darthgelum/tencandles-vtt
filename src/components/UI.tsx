@@ -8,7 +8,7 @@ import socket from "utils/socket"
 import { TbFlame, TbLock, TbLockOpen, TbX } from "react-icons/tb"
 import User from "types/User"
 import { useUser } from "context/UserContext"
-import { getCardClasses, getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
+import { getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
 import CreateCardModal from "./CreateCardModal"
 import Card from "types/Card"
 import UserDroppable from "./UserDroppable"
@@ -18,13 +18,15 @@ import CardType from "enums/CardType"
 import CandleModal from "./CandleModal"
 import OnboardingStage from "enums/OnboardingStage"
 import { useOnboarding } from "context/OnboardingContext"
+import GmAssignModal from "./GmAssignModal"
+import { CARD_CLASSES } from "utils/constants"
 
 type UserIdToCards = { userId: string; cards: Card[] }
 
 export default function UI() {
   const { isOnboardingOpen, setIsOnboardingOpen, currentOnboardingStage, startOnboardingStage } = useOnboarding()
 
-  const { user, areCardsLocked, setAreCardsLocked } = useUser()
+  const { user, setUser, areCardsLocked, setAreCardsLocked } = useUser()
   const { room } = useParams()
   console.log("currentOnboardingStage", currentOnboardingStage)
   const [users, setUsers] = useState<User[]>([])
@@ -35,6 +37,7 @@ export default function UI() {
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
   const [showCandleModal, setShowCandleModal] = useState(false)
+  const [userToMakeGm, setUserToMakeGm] = useState<User | null>(null)
 
   useEffect(() => {
     if (
@@ -43,6 +46,7 @@ export default function UI() {
       cards.length === 1 &&
       cards[0].type !== CardType.Character
     ) {
+      console.log(" startOnboardingStage(OnboardingStage.SingleCard)")
       startOnboardingStage(OnboardingStage.SingleCard)
     } else if (
       showCards &&
@@ -66,13 +70,16 @@ export default function UI() {
     socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
       // reorder users so that this user is first in the array
       const reorderedUsers: User[] = []
-      const userIndex = updatedUsers.findIndex((u) => u.name === user!.name)
+      const userIndex = updatedUsers.findIndex((u) => u.id === user!.id)
 
       for (let index = userIndex, reorderedIndex = 0; reorderedIndex < updatedUsers.length; index++, reorderedIndex++) {
         if (index === updatedUsers.length) index = 0
         reorderedUsers[reorderedIndex] = updatedUsers[index]
       }
       setUsers(reorderedUsers)
+
+      const updatedCurrentUser = updatedUsers[userIndex]
+      setUser(updatedCurrentUser)
 
       if (toastText) toast(toastText)
 
@@ -90,7 +97,7 @@ export default function UI() {
       setAreCardsLocked(isLocked)
       toast(
         isLocked
-          ? "Cards are now locked.\nMouse over a user to see the top card on their stack."
+          ? "Cards are now locked.\nMouse over a user to see the top card of their stack."
           : "Cards are now unlocked.",
         { duration: isLocked ? 6000 : undefined }
       )
@@ -154,7 +161,7 @@ export default function UI() {
     >
       <DragOverlay>
         {draggingCard ? (
-          <div className={getCardClasses(draggingCard.type)}>
+          <div className={CARD_CLASSES}>
             {!areCardsLocked && (
               <div className="absolute top-3 right-3">
                 <TbX className="h-6 w-6" />
@@ -191,13 +198,7 @@ export default function UI() {
               ) : (
                 <div className={clsx(characterCard && cards.length > 1 && "gap-24", "flex")}>
                   {characterCard && (
-                    <div
-                      className={clsx(
-                        getCardClasses(CardType.Character),
-                        cards.length === 1 ? "" : "-mt-48",
-                        "card_character z-50"
-                      )}
-                    >
+                    <div className={clsx(cards.length === 1 ? "" : "-mt-48", CARD_CLASSES, "card_character z-50")}>
                       {!areCardsLocked && (
                         <div
                           className="absolute top-3 right-3 hover:text-red"
@@ -264,13 +265,13 @@ export default function UI() {
               user={u}
               cards={peerUserCards?.[u.id]}
               areCardsLocked={areCardsLocked}
-              isThisUser={u.name === user!.name}
               onOpenCardStack={() => {
                 setShowCards(true)
                 if (isOnboardingOpen && currentOnboardingStage === OnboardingStage.Table) {
                   setIsOnboardingOpen(false)
                 }
               }}
+              onMakeUserGm={() => setUserToMakeGm(u)}
               moreClasses={getUserPositionClasses(i, users.length)}
             />
           ))}
@@ -291,6 +292,16 @@ export default function UI() {
         />
       )}
       {showCandleModal && <CandleModal onClose={() => setShowCandleModal(false)} />}
+      {userToMakeGm && (
+        <GmAssignModal
+          user={userToMakeGm}
+          onConfirm={() => {
+            socket.emit("updateGm", { room, oldGm: user, newGm: userToMakeGm })
+            setUserToMakeGm(null)
+          }}
+          onCancel={() => setUserToMakeGm(null)}
+        />
+      )}
     </DndContext>
   )
 }

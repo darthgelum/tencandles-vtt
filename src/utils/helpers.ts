@@ -1,14 +1,6 @@
 import { rectIntersection } from "@dnd-kit/core"
-import CardType from "enums/CardType"
 import Die from "types/Die"
 import { uniqueNamesGenerator, colors, animals, NumberDictionary } from "unique-names-generator"
-
-export function getCardClasses(cardType: CardType) {
-  let backgroundColor = "bg-yellow"
-  // if (cardType === CardType.Brink) backgroundColor = "bg-red"
-  // if (cardType === CardType.Moment) backgroundColor = "bg-lightblue"
-  return `${backgroundColor} card relative px-4 py-3 w-[350px] h-[210px] text-black shadow-[0px_0px_20px_5px_rgba(0,0,0,0.15)]`
-}
 
 export function getInitialDice(): Die[] {
   return [...Array(10)].map((_, i) => ({ id: i + 1, num: (i % 6) + 1 }))
