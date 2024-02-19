@@ -26,7 +26,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
   return (
     <>
       <div className="h-screen w-screen fixed bg-black opacity-70 z-50" />
-      <div className="flex flex-col p-4 bg-yellow w-[500px] h-[300px] z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black">
+      <div className="flex flex-col p-4 bg-yellow w-[500px] z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black">
         <select
           className="block p-2 border border-black bg-[transparent] w-full text-lg"
           value={type}
@@ -35,7 +35,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
           <option value="" disabled>
             Select a card type
           </option>
-          {Object.keys(CardType).map((cardType) => (
+          {Object.values(CardType).map((cardType) => (
             <option key={cardType} value={cardType} disabled={isOptionDisabled(cardType)}>
               {cardType}
             </option>
@@ -46,9 +46,9 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="bg-[transparent] border-black mt-2 w-full placeholder:text-[rgba(0,0,0,0.4)]"
-          rows={6}
+          rows={7}
         />
-        <div className="mt-auto flex justify-end gap-4">
+        <div className="mt-2 flex justify-end gap-4">
           <button className="" onClick={onClose}>
             Cancel
           </button>

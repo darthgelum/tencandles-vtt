@@ -1,8 +1,9 @@
 enum OnboardingStage {
-  Table = 1,
+  Table,
   SingleCard,
   MultipleCards,
-  Done,
+  GmButtons,
+  GmLock,
 }
 
 export default OnboardingStage

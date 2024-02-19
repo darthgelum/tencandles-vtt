@@ -5,7 +5,7 @@ import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
-import { TbFlame, TbLock, TbLockOpen, TbX } from "react-icons/tb"
+import { TbFlame, TbLock, TbLockOpen, TbPencil, TbX } from "react-icons/tb"
 import User from "types/User"
 import { useUser } from "context/UserContext"
 import { getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
@@ -23,12 +23,18 @@ import { CARD_CLASSES } from "utils/constants"
 
 type UserIdToCards = { userId: string; cards: Card[] }
 
-export default function UI() {
-  const { isOnboardingOpen, setIsOnboardingOpen, currentOnboardingStage, startOnboardingStage } = useOnboarding()
+export default function UI({ candles }: { candles: boolean[] }) {
+  const {
+    isOnboardingOpen,
+    setIsOnboardingOpen,
+    currentOnboardingStage,
+    startOnboardingStage,
+    completedOnboardingStages,
+  } = useOnboarding()
 
   const { user, setUser, areCardsLocked, setAreCardsLocked } = useUser()
   const { room } = useParams()
-  console.log("currentOnboardingStage", currentOnboardingStage)
+
   const [users, setUsers] = useState<User[]>([])
   const [cards, setCards] = useState<Card[]>([])
   const [peerUserCards, setPeerUserCards] = useState<UserIdToCards>()
@@ -41,22 +47,67 @@ export default function UI() {
 
   useEffect(() => {
     if (
-      currentOnboardingStage === OnboardingStage.Table &&
+      completedOnboardingStages.includes(OnboardingStage.Table) &&
       !isOnboardingOpen &&
       cards.length === 1 &&
-      cards[0].type !== CardType.Character
+      cards[0].type !== CardType.Character &&
+      currentOnboardingStage !== OnboardingStage.SingleCard &&
+      !completedOnboardingStages.includes(OnboardingStage.SingleCard)
     ) {
-      console.log(" startOnboardingStage(OnboardingStage.SingleCard)")
       startOnboardingStage(OnboardingStage.SingleCard)
     } else if (
       showCards &&
-      currentOnboardingStage === OnboardingStage.SingleCard &&
+      completedOnboardingStages.includes(OnboardingStage.SingleCard) &&
       !isOnboardingOpen &&
-      cards.filter((c) => c.type !== CardType.Character).length > 1
+      cards.filter((c) => c.type !== CardType.Character).length > 1 &&
+      currentOnboardingStage !== OnboardingStage.MultipleCards &&
+      !completedOnboardingStages.includes(OnboardingStage.MultipleCards)
     ) {
       startOnboardingStage(OnboardingStage.MultipleCards)
+    } else if (
+      user?.isGm &&
+      !showCards &&
+      !isOnboardingOpen &&
+      completedOnboardingStages.includes(OnboardingStage.Table) &&
+      !completedOnboardingStages.includes(OnboardingStage.GmButtons) &&
+      currentOnboardingStage !== OnboardingStage.GmButtons
+    ) {
+      startOnboardingStage(OnboardingStage.GmButtons)
     }
-  }, [cards, currentOnboardingStage, isOnboardingOpen, setIsOnboardingOpen, showCards, startOnboardingStage])
+  }, [
+    cards,
+    currentOnboardingStage,
+    isOnboardingOpen,
+    setIsOnboardingOpen,
+    showCards,
+    startOnboardingStage,
+    user?.isGm,
+    completedOnboardingStages,
+  ])
+
+  useEffect(() => {
+    if (
+      user?.isGm &&
+      !candles.includes(false) &&
+      !isOnboardingOpen &&
+      !showCards &&
+      !areCardsLocked &&
+      !completedOnboardingStages.includes(OnboardingStage.GmLock) &&
+      currentOnboardingStage !== OnboardingStage.GmLock
+    ) {
+      startOnboardingStage(OnboardingStage.GmLock)
+    }
+  }, [
+    setIsOnboardingOpen,
+    currentOnboardingStage,
+    user?.isGm,
+    candles,
+    isOnboardingOpen,
+    showCards,
+    startOnboardingStage,
+    completedOnboardingStages,
+    areCardsLocked,
+  ])
 
   useEffect(() => {
     function onKeyUp(e: KeyboardEvent) {
@@ -97,9 +148,9 @@ export default function UI() {
       setAreCardsLocked(isLocked)
       toast(
         isLocked
-          ? "Cards are now locked.\nMouse over a user to see the top card of their stack."
-          : "Cards are now unlocked.",
-        { duration: isLocked ? 6000 : undefined }
+          ? "Card stacks are now locked.\nMouse over a user to see the top card of their stack."
+          : "Card starts are now unlocked.",
+        { duration: isLocked ? 5000 : undefined }
       )
 
       if (isLocked) socket.emit("updatePeerUserCards", { room, userId: user!.id, cards })
@@ -174,16 +225,6 @@ export default function UI() {
       </DragOverlay>
       <SortableContext items={[...cards]} strategy={verticalListSortingStrategy}>
         <div className="absolute w-screen h-screen flex justify-center items-center overflow-hidden">
-          {showCreateCardModal && (
-            <CreateCardModal
-              cards={cards}
-              addCard={(card) => setCards((prevState) => [...prevState, card])}
-              onClose={() => {
-                setShowCreateCardModal(false)
-                setShowCards(true)
-              }}
-            />
-          )}
           {showCards && (
             <>
               <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={() => setShowCards(false)} />
@@ -204,12 +245,15 @@ export default function UI() {
                           className="absolute top-3 right-3 hover:text-red"
                           onClick={() => {
                             setCardToDelete(characterCard)
-                            setShowCards(false)
+                            // setShowCards(false)
                           }}
                         >
                           <TbX className="h-6 w-6" />
                         </div>
                       )}
+                      <button className="hover:text-red">
+                        <TbPencil className="h-6 w-6" />
+                      </button>
                       <div className="">{CardType.Character}</div>
                       <div className="text-sm mt-2">{characterCard.content}</div>
                     </div>
@@ -224,7 +268,7 @@ export default function UI() {
                           areCardsLocked={areCardsLocked}
                           onDelete={() => {
                             setCardToDelete(card)
-                            setShowCards(false)
+                            // setShowCards(false)
                           }}
                         />
                       ))}
@@ -235,23 +279,23 @@ export default function UI() {
           )}
           <div className="absolute top-2 right-2 z-50 flex items-center gap-3">
             {user?.isGm && (
-              <>
+              <div className="gm-btns">
                 <button
                   onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}
-                  className="text-yellow hover:brightness-110"
+                  className="btn_lock text-yellow hover:brightness-110"
                 >
                   {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
                 </button>
                 <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110 mr-2">
-                  <TbFlame className="h-12 w-12" />
+                  <TbFlame className="btn_flame h-12 w-12" />
                 </button>
-              </>
+              </div>
             )}
             <button
               className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
               disabled={areCardsLocked}
               onClick={() => {
-                setShowCards(false)
+                // setShowCards(false)
                 setShowCreateCardModal(true)
               }}
             >
@@ -263,6 +307,7 @@ export default function UI() {
             <UserDroppable
               key={u.id}
               user={u}
+              currentUser={user!}
               cards={peerUserCards?.[u.id]}
               areCardsLocked={areCardsLocked}
               onOpenCardStack={() => {
@@ -277,6 +322,16 @@ export default function UI() {
           ))}
         </div>
       </SortableContext>
+      {showCreateCardModal && (
+        <CreateCardModal
+          cards={cards}
+          addCard={(card) => setCards((prevState) => [...prevState, card])}
+          onClose={() => {
+            setShowCreateCardModal(false)
+            setShowCards(true)
+          }}
+        />
+      )}
       {cardToDelete && (
         <DeleteCardModal
           card={cardToDelete}

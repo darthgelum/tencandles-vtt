@@ -72,7 +72,7 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
           <TbX className="h-6 w-6" />
         </button>
       )}
-      <div className="">{card.type}</div>
+      <div>{card.type}</div>
       <div className="mt-3 text-sm">{card.content}</div>
     </div>
   )

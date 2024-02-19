@@ -27,13 +27,13 @@ export default function Room() {
   })
   const [draggingDice, setDraggingDice] = useState<{ dieId: number; username: string }[]>([])
 
-  const { currentOnboardingStage, setIsOnboardingOpen } = useOnboarding()
+  const { startOnboardingStage, completedOnboardingStages } = useOnboarding()
 
   useEffect(() => {
-    if (user && currentOnboardingStage === OnboardingStage.Table) {
-      setIsOnboardingOpen(true)
+    if (user && !completedOnboardingStages.includes(OnboardingStage.Table)) {
+      startOnboardingStage(OnboardingStage.Table)
     }
-  }, [setIsOnboardingOpen, user?.id, currentOnboardingStage])
+  }, [user?.id, completedOnboardingStages])
 
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
@@ -224,7 +224,7 @@ export default function Room() {
           />
         </div>
       </DndContext>
-      <UI />
+      <UI candles={candles} />
     </>
   )
 }

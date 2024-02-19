@@ -20,12 +20,13 @@ export default function Lobby({ room }: { room?: string }) {
 
     if (room) {
       try {
-        const res = await fetch(`${import.meta.env.VITE_SERVER_URL!}/user?username=${username}&room=${room}`)
-        const result = await res.json()
-        if (result.doesUserExist) {
+        const res = await fetch(`${import.meta.env.VITE_SERVER_URL!}/users?room=${room}`)
+        const usersInRoom = await res.json()
+        if (usersInRoom.find((u) => u.name === username)) {
           throw new Error("There is already a user with this name in the room.")
         }
-        setUser({ id: nanoid(), name: username, isGm: false })
+        // make this user the GM if there are no other users in this room
+        setUser({ id: nanoid(), name: username, isGm: !usersInRoom.length })
       } catch (err: any) {
         setIsLoading(false)
         return setError(err.message)
@@ -72,7 +73,7 @@ export default function Lobby({ room }: { room?: string }) {
         {error && <div className="text-red text-sm mb-3 -mt-1">{error}</div>}
         <button
           disabled={!username || isLoading}
-          className="w-full sm:w-96 bg-yellow text-black py-3 px-4 hover:brightness-[110%]"
+          className="w-full sm:w-96 bg-yellow text-black py-3 px-4 hover:brightness-[110%] disabled:hover:brightness-100 disabled:opacity-60"
         >
           {buttonText}
         </button>

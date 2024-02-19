@@ -4,11 +4,11 @@ import User from "types/User"
 import { useState } from "react"
 import Card from "types/Card"
 import CardType from "enums/CardType"
-import { useUser } from "context/UserContext"
 import { CARD_CLASSES } from "utils/constants"
 
 type Props = {
   user: User
+  currentUser: User
   cards?: Card[]
   areCardsLocked: boolean
   onOpenCardStack: () => void
@@ -18,13 +18,13 @@ type Props = {
 
 export default function UserDroppable({
   user,
+  currentUser,
   cards,
   areCardsLocked,
   onOpenCardStack,
   onMakeUserGm,
   moreClasses,
 }: Props) {
-  const { user: currentUser } = useUser()
   const { setNodeRef, isOver } = useDroppable({ id: user.id, data: { user } })
   const [showTopCards, setShowTopCards] = useState(false)
 
@@ -53,7 +53,7 @@ export default function UserDroppable({
 
   return (
     <>
-      <div className={clsx("text-center absolute z-50", moreClasses)}>
+      <div className={clsx(!areCardsLocked && "z-50", "text-center absolute", moreClasses)}>
         <button
           ref={setNodeRef}
           className={clsx(
@@ -65,6 +65,7 @@ export default function UserDroppable({
           )}
           onClick={handleClick}
           onMouseEnter={() => {
+            console.log("etner")
             if (areCardsLocked) setShowTopCards(true)
           }}
           onMouseLeave={() => {

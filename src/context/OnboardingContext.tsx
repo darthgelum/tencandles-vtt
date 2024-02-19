@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from "react"
+import React, { createContext, useContext, useMemo, useState } from "react"
 import { TourProvider, useTour } from "@reactour/tour"
 import useLocalStorage from "@rehooks/local-storage"
 import { ONBOARDING_STEPS, ONBOARDING_STORAGE_KEY } from "utils/constants"
@@ -7,32 +7,41 @@ import OnboardingStage from "enums/OnboardingStage"
 const OnboardingRootContext = createContext<OnboardingRootProviderValue | undefined>(undefined)
 
 type OnboardingRootProviderValue = {
+  completedOnboardingStages: OnboardingStage[]
+  setCompletedOnboardingStages: (stages: OnboardingStage[]) => void
   currentOnboardingStage: OnboardingStage
-  setCurrentOnboardingStage: (value: OnboardingStage) => void
+  setCurrentOnboardingStage: React.Dispatch<React.SetStateAction<OnboardingStage>>
 }
 
 export function OnboardingRootProvider({ children }) {
-  const [currentOnboardingStage, setCurrentOnboardingStage] = useLocalStorage<OnboardingStage>(
+  const [completedOnboardingStages, setCompletedOnboardingStages] = useLocalStorage<OnboardingStage[]>(
     ONBOARDING_STORAGE_KEY,
-    OnboardingStage.Table
+    []
   )
+  const [currentOnboardingStage, setCurrentOnboardingStage] = useState<OnboardingStage>(OnboardingStage.Table)
 
   const providerValue = useMemo(
     () => ({
+      completedOnboardingStages,
+      setCompletedOnboardingStages,
       currentOnboardingStage,
       setCurrentOnboardingStage,
     }),
-    [currentOnboardingStage, setCurrentOnboardingStage]
+    [completedOnboardingStages, currentOnboardingStage, setCompletedOnboardingStages]
   )
 
   return (
     <TourProvider
-      steps={ONBOARDING_STEPS[currentOnboardingStage]}
+      steps={[]}
       showBadge={false}
       showDots={ONBOARDING_STEPS[currentOnboardingStage].length > 1}
       showPrevNextButtons={ONBOARDING_STEPS[currentOnboardingStage].length > 1}
       showNavigation={ONBOARDING_STEPS[currentOnboardingStage].length > 1}
       padding={currentOnboardingStage === OnboardingStage.MultipleCards ? 50 : undefined}
+      beforeClose={() => {
+        console.log(completedOnboardingStages, currentOnboardingStage)
+        setCompletedOnboardingStages([...completedOnboardingStages, currentOnboardingStage])
+      }}
       onClickHighlighted={(e, clickProps) => {
         if (clickProps.currentStep === clickProps.steps!.length - 1) {
           clickProps.setIsOpen(false)
@@ -65,10 +74,12 @@ type OnboardingProviderValue = {
   startOnboardingStage: (stage: OnboardingStage) => void
   setIsOnboardingOpen: React.Dispatch<React.SetStateAction<Boolean>>
   isOnboardingOpen: Boolean
+  completedOnboardingStages: OnboardingStage[]
 }
 
 function OnboardingProvider({ children }) {
-  const { currentOnboardingStage, setCurrentOnboardingStage } = useContext(OnboardingRootContext)!
+  const { currentOnboardingStage, setCurrentOnboardingStage, completedOnboardingStages } =
+    useContext(OnboardingRootContext)!
   const { setIsOpen: setIsOnboardingOpen, isOpen: isOnboardingOpen, setCurrentStep, setSteps } = useTour()
 
   const providerValue = useMemo(
@@ -79,11 +90,25 @@ function OnboardingProvider({ children }) {
         setSteps!(ONBOARDING_STEPS[stage])
         setCurrentStep(0)
         setIsOnboardingOpen(true)
+        // hack to prevent GmButtons stage from appearing twice
+        // if (ONBOARDING_STEPS[stage].length === 1) {
+        //   console.log("add")
+        //   setCompletedOnboardingStages([...completedOnboardingStages, stage])
+        // }
       },
       setIsOnboardingOpen,
       isOnboardingOpen,
+      completedOnboardingStages,
     }),
-    [currentOnboardingStage, isOnboardingOpen, setCurrentOnboardingStage, setCurrentStep, setIsOnboardingOpen, setSteps]
+    [
+      currentOnboardingStage,
+      setIsOnboardingOpen,
+      isOnboardingOpen,
+      completedOnboardingStages,
+      setCurrentOnboardingStage,
+      setSteps,
+      setCurrentStep,
+    ]
   )
 
   return <OnboardingContext.Provider value={providerValue}>{children}</OnboardingContext.Provider>
