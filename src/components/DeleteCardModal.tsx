@@ -11,7 +11,7 @@ type Props = {
 export default function DeleteCardModal({ card, onDelete, onCancel }: Props) {
   return (
     <>
-      <div className="h-screen w-screen fixed bg-black opacity-70 z-50" />
+      <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={onCancel} />
       <div className="flex flex-col gap-4 justify-center items-center text-white z-50 fixed w-fit h-fit text-lg bg-grey px-8 py-6">
         Are you sure you want to remove this card?
         <div className={CARD_CLASSES}>

@@ -25,7 +25,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
 
   return (
     <>
-      <div className="h-screen w-screen fixed bg-black opacity-70 z-50" />
+      <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={onClose} />
       <div className="flex flex-col p-4 bg-yellow w-[500px] z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black">
         <select
           className="block p-2 border border-black bg-[transparent] w-full text-lg"

@@ -5,7 +5,18 @@ import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
-import { TbFlame, TbLock, TbLockOpen, TbPencil, TbX } from "react-icons/tb"
+import {
+  TbFlame,
+  TbHelp,
+  TbHelpCircle,
+  TbLock,
+  TbLockOpen,
+  TbPencil,
+  TbQuestionMark,
+  TbTextCaption,
+  TbTextSize,
+  TbX,
+} from "react-icons/tb"
 import User from "types/User"
 import { useUser } from "context/UserContext"
 import { getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
@@ -21,6 +32,7 @@ import { useOnboarding } from "context/OnboardingContext"
 import GmAssignModal from "./GmAssignModal"
 import { CARD_CLASSES } from "utils/constants"
 import CharacterCard from "./CharacterCard"
+import HelpModal from "./HelpModal"
 
 type UserIdToCards = { userId: string; cards: Card[] }
 
@@ -44,7 +56,9 @@ export default function UI({ candles }: { candles: boolean[] }) {
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
   const [showCandleModal, setShowCandleModal] = useState(false)
+  const [showHelpModal, setShowHelpModal] = useState(false)
   const [userToMakeGm, setUserToMakeGm] = useState<User | null>(null)
+  const [isPixelFont, setIsPixelFont] = useState(true)
 
   useEffect(() => {
     if (
@@ -114,6 +128,8 @@ export default function UI({ candles }: { candles: boolean[] }) {
       if (e.key === "Escape") {
         if (showCandleModal) {
           setShowCandleModal(false)
+        } else if (showHelpModal) {
+          setShowHelpModal(false)
         } else if (showCreateCardModal) {
           setShowCreateCardModal(false)
         } else if (cardToDelete) {
@@ -125,7 +141,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
     }
     window.addEventListener("keyup", onKeyUp)
     return () => window.removeEventListener("keyup", onKeyUp)
-  }, [cardToDelete, showCandleModal, showCards, showCreateCardModal])
+  }, [cardToDelete, showCandleModal, showCards, showCreateCardModal, showHelpModal])
 
   useEffect(() => {
     socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
@@ -180,6 +196,10 @@ export default function UI({ candles }: { candles: boolean[] }) {
       socket.removeAllListeners("lockChanged")
     }
   })
+
+  useEffect(() => {
+    document.documentElement.style.fontFamily = isPixelFont ? "PixelMix" : "Verdana"
+  }, [isPixelFont])
 
   function handleCardDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -300,7 +320,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
               )}
             </>
           )}
-          <div className="absolute top-2 right-2 z-50 flex items-center gap-3">
+          <div className="absolute top-2 right-2 z-50 flex items-center">
             {user?.isGm && (
               <div className="gm-btns">
                 <button
@@ -309,18 +329,24 @@ export default function UI({ candles }: { candles: boolean[] }) {
                 >
                   {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
                 </button>
-                <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110 mr-2">
+                <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110">
                   <TbFlame className="btn_flame h-12 w-12" />
                 </button>
               </div>
             )}
+            <button onClick={() => setShowHelpModal(true)} className="text-yellow  hover:brightness-110">
+              <TbHelp className="h-12 w-12" />
+            </button>
+            <button
+              onClick={() => setIsPixelFont((prevState) => !prevState)}
+              className="text-4xl w-12 text-yellow mr-2 hover:brightness-110"
+            >
+              A
+            </button>
             <button
               className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
               disabled={areCardsLocked}
-              onClick={() => {
-                // setShowCards(false)
-                setShowCreateCardModal(true)
-              }}
+              onClick={() => setShowCreateCardModal(true)}
             >
               Add Card
             </button>
@@ -378,6 +404,12 @@ export default function UI({ candles }: { candles: boolean[] }) {
             setUserToMakeGm(null)
           }}
           onCancel={() => setUserToMakeGm(null)}
+        />
+      )}
+      {showHelpModal && (
+        <HelpModal
+          onSwitchFont={() => setIsPixelFont((prevState) => !prevState)}
+          onClose={() => setShowHelpModal(false)}
         />
       )}
     </DndContext>

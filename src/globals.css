@@ -7,13 +7,43 @@
   src: url("../fonts/pixelmix.ttf");
 }
 
+@font-face {
+  font-family: "Tahoma";
+  src: url("../fonts/tahoma.ttf");
+}
+
+@font-face {
+  font-family: "Verdana";
+  src: url("../fonts/verdana.ttf");
+}
+
 body,
 html {
   @apply h-screen w-screen overflow-hidden;
 }
 
+html {
+  @apply font-pixel text-[16px];
+}
+
 #root {
-  @apply bg-black font-pixel text-white h-screen w-screen flex justify-center items-center overflow-hidden;
+  @apply bg-black text-white h-screen w-screen flex justify-center items-center overflow-hidden;
+}
+
+ul {
+  @apply list-disc space-y-3 ml-4;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#7e7a7a] rounded-full hover:bg-[#5b5a6b];
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[#342c29];
 }
 
 :root {

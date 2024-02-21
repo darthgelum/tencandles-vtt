@@ -16,7 +16,7 @@ export default function CandleModal({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="h-screen w-screen fixed bg-black opacity-70 z-50" />
+      <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={onClose} />
       <div className="text-center text-white z-50 fixed max-w-[650px] h-fit bg-grey px-8 py-6">
         <div>Each candle will go out</div>
         <input
