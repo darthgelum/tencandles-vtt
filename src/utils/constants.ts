@@ -38,7 +38,11 @@ export const ONBOARDING_STEPS = {
     },
   ],
   [OnboardingStage.SingleCard]: [
-    { selector: ".card", content: "You can drag a card onto another player to give it to them." },
+    {
+      selector: ".card",
+      content:
+        "You can drag a card onto another player to give it to them. (If there are no other players here yet, invite them by sending them this page's URL.)",
+    },
   ],
   [OnboardingStage.MultipleCards]: [
     {

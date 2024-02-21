@@ -18,11 +18,11 @@ export default function DeleteCardModal({ card, onDelete, onCancel }: Props) {
           <div className="absolute top-3 right-3">
             <TbX className="h-6 w-6" />
           </div>
-          <div className="text-base">{card.type}</div>
+          <div className="text-lg">{card.type}</div>
           <div className="mt-3 text-sm">{card.content}</div>
         </div>
         <div className="flex gap-4 text-base">
-          <button className="" onClick={onCancel}>
+          <button className="hover:text-yellow" onClick={onCancel}>
             Cancel
           </button>
           <button

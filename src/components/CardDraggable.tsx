@@ -63,7 +63,7 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
     >
       {!areCardsLocked && (
         <button
-          className="absolute top-3 right-3 hover:text-red"
+          className="absolute top-2 right-2 p-1 hover:text-red"
           onClick={onDelete}
           // this prevents clicking delete button from starting drag
           onMouseEnter={() => setIsDragDisabled(true)}
@@ -72,7 +72,7 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
           <TbX className="h-6 w-6" />
         </button>
       )}
-      <div>{card.type}</div>
+      <div className="text-lg">{card.type}</div>
       <div className="mt-3 text-sm">{card.content}</div>
     </div>
   )

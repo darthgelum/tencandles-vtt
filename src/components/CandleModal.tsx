@@ -47,7 +47,7 @@ export default function CandleModal({ onClose }: { onClose: () => void }) {
           You will need to relight any candles that are already lit for this new duration to take effect.
         </div>
         <div className="flex gap-4 text-base justify-center mt-8">
-          <button className="" onClick={onClose}>
+          <button className="hover:text-yellow" onClick={onClose}>
             Cancel
           </button>
           <button

@@ -66,6 +66,8 @@ export default function Room() {
         socket.disconnect()
       }
     }
+    // we only want to rerun if user id changes
+    // eslint-disable-next-line
   }, [room, user?.id])
 
   useEffect(() => {

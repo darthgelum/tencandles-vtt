@@ -20,6 +20,7 @@ import OnboardingStage from "enums/OnboardingStage"
 import { useOnboarding } from "context/OnboardingContext"
 import GmAssignModal from "./GmAssignModal"
 import { CARD_CLASSES } from "utils/constants"
+import CharacterCard from "./CharacterCard"
 
 type UserIdToCards = { userId: string; cards: Card[] }
 
@@ -49,8 +50,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
     if (
       completedOnboardingStages.includes(OnboardingStage.Table) &&
       !isOnboardingOpen &&
-      cards.length === 1 &&
-      cards[0].type !== CardType.Character &&
+      ((cards.length === 1 && cards[0].type !== CardType.Character) || cards.length === 2) &&
       currentOnboardingStage !== OnboardingStage.SingleCard &&
       !completedOnboardingStages.includes(OnboardingStage.SingleCard)
     ) {
@@ -111,11 +111,21 @@ export default function UI({ candles }: { candles: boolean[] }) {
 
   useEffect(() => {
     function onKeyUp(e: KeyboardEvent) {
-      if (e.key === "Escape") setShowCards(false)
+      if (e.key === "Escape") {
+        if (showCandleModal) {
+          setShowCandleModal(false)
+        } else if (showCreateCardModal) {
+          setShowCreateCardModal(false)
+        } else if (cardToDelete) {
+          setCardToDelete(null)
+        } else if (showCards) {
+          setShowCards(false)
+        }
+      }
     }
     window.addEventListener("keyup", onKeyUp)
     return () => window.removeEventListener("keyup", onKeyUp)
-  }, [])
+  }, [cardToDelete, showCandleModal, showCards, showCreateCardModal])
 
   useEffect(() => {
     socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
@@ -196,6 +206,31 @@ export default function UI({ candles }: { candles: boolean[] }) {
     }
   }
 
+  const [needsToUpdatePeersAfterUpdatingCharacterCard, setNeedsToUpdatePeersAfterUpdatingCharacterCard] =
+    useState(false)
+
+  useEffect(() => {
+    if (needsToUpdatePeersAfterUpdatingCharacterCard && areCardsLocked) {
+      console.log("emit")
+      socket.emit("updatePeerUserCards", { room, userId: user!.id, cards })
+      setNeedsToUpdatePeersAfterUpdatingCharacterCard(false)
+    }
+  }, [cards, areCardsLocked, room, user, needsToUpdatePeersAfterUpdatingCharacterCard])
+
+  function handleCharacterCardUpdate(newContent: string) {
+    setCards((prevState) => {
+      const newState = [...prevState]
+      const _characterCard = newState.find((c) => c.type === CardType.Character)
+      if (_characterCard) {
+        _characterCard.content = newContent
+      } else {
+        console.error("Trying to update character card but character card not found.")
+      }
+      return newState
+    })
+    setNeedsToUpdatePeersAfterUpdatingCharacterCard(true)
+  }
+
   const characterCard = cards.find((c) => c.type === CardType.Character)
 
   return (
@@ -239,24 +274,12 @@ export default function UI({ candles }: { candles: boolean[] }) {
               ) : (
                 <div className={clsx(characterCard && cards.length > 1 && "gap-24", "flex")}>
                   {characterCard && (
-                    <div className={clsx(cards.length === 1 ? "" : "-mt-48", CARD_CLASSES, "card_character z-50")}>
-                      {!areCardsLocked && (
-                        <div
-                          className="absolute top-3 right-3 hover:text-red"
-                          onClick={() => {
-                            setCardToDelete(characterCard)
-                            // setShowCards(false)
-                          }}
-                        >
-                          <TbX className="h-6 w-6" />
-                        </div>
-                      )}
-                      <button className="hover:text-red">
-                        <TbPencil className="h-6 w-6" />
-                      </button>
-                      <div className="">{CardType.Character}</div>
-                      <div className="text-sm mt-2">{characterCard.content}</div>
-                    </div>
+                    <CharacterCard
+                      content={characterCard.content}
+                      cards={cards}
+                      onUpdate={handleCharacterCardUpdate}
+                      onDelete={() => setCardToDelete(characterCard)}
+                    />
                   )}
                   <div className={clsx(!characterCard && "-mt-28", "card-stack z-50")}>
                     {cards

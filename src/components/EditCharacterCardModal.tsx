@@ -53,7 +53,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
             Cancel
           </button>
           <button
-            disabled={!type}
+            disabled={!type || !content}
             className="px-3 py-2 bg-blue text-white hover:brightness-125 disabled:opacity-60 disabled:hover:brightness-100"
             onClick={handleCreate}
           >

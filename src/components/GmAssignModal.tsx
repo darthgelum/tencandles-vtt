@@ -15,7 +15,7 @@ export default function GmAssignModal({ user, onConfirm, onCancel }: Props) {
           Are you sure you want to make <span className="text-yellow">{user.name}</span> the GM?
         </p>
         <div className="mt-auto flex justify-end gap-4">
-          <button className="" onClick={onCancel}>
+          <button className="hover:text-yellow" onClick={onCancel}>
             Cancel
           </button>
           <button

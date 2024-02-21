@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { ToastBar, Toaster } from "react-hot-toast"
+import toast, { ToastBar, Toaster } from "react-hot-toast"
 import { keyframes } from "goober"
 import "globals.css"
 import Lobby from "components/Lobby"
@@ -9,6 +9,7 @@ import Room from "components/Room"
 import { UserProvider } from "context/UserContext"
 import Test from "components/Test"
 import { OnboardingRootProvider } from "context/OnboardingContext"
+import { TbX } from "react-icons/tb"
 
 const router = createBrowserRouter([
   {
@@ -49,9 +50,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               ...t.style,
               animation: t.visible
                 ? `${keyframes(slideInAnimation)} 0.35s cubic-bezier(.21,1.02,.73,1) forwards`
-                : `${keyframes(fadeOutAnimation)} 1.5s forwards`,
+                : `${keyframes(fadeOutAnimation)} 1s forwards`,
             }}
-          />
+          >
+            {({ message }) => (
+              <>
+                {message}
+                <button onClick={() => toast.dismiss(t.id)}>
+                  <TbX className="text-white h-5 w-5" />
+                </button>
+              </>
+            )}
+          </ToastBar>
         )}
       </Toaster>
     </OnboardingRootProvider>

@@ -3,7 +3,7 @@ enum CardType {
   Vice = "Vice",
   Brink = "Brink",
   Moment = "Moment",
-  Character = "Character & Inventory",
+  Character = "Character/Inventory",
 }
 
 export default CardType
