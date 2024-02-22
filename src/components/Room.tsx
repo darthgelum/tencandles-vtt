@@ -16,7 +16,7 @@ import OnboardingStage from "enums/OnboardingStage"
 import { useOnboarding } from "context/OnboardingContext"
 
 export default function Room() {
-  const { user, areCardsLocked } = useUser()
+  const { user, areCardsLocked, setAreCardsLocked } = useUser()
   const { room } = useParams()
 
   const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
@@ -30,10 +30,10 @@ export default function Room() {
   const { startOnboardingStage, completedOnboardingStages } = useOnboarding()
 
   useEffect(() => {
-    if (user && !completedOnboardingStages.includes(OnboardingStage.Table)) {
+    if (user?.id && !completedOnboardingStages.includes(OnboardingStage.Table)) {
       startOnboardingStage(OnboardingStage.Table)
     }
-  }, [user?.id, completedOnboardingStages])
+  }, [user?.id, completedOnboardingStages, startOnboardingStage])
 
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
@@ -57,6 +57,12 @@ export default function Room() {
       socket.on("connect", () => {
         socket.emit("userJoined", { user, room })
       })
+
+      socket.on("disconnect", () => {
+        toast(
+          "You've been disconnected. Try refreshing the page and joining again with the same username. If you use a different username, you'll lose your cards."
+        )
+      })
     }
     if (user) initSocket()
 
@@ -72,12 +78,13 @@ export default function Room() {
 
   useEffect(() => {
     socket.on("usersUpdated", () => {
-      if (user!.isGm) socket.emit("passInitialDicePoolsAndCandles", { room, dicePools, candles })
+      if (user!.isGm) socket.emit("passInitialState", { room, dicePools, candles, areCardsLocked })
     })
 
-    socket.on("passedInitialDicePoolsAndCandles", ({ dicePools: _dicePools, candles: _candles }) => {
+    socket.on("passedInitialState", ({ dicePools: _dicePools, candles: _candles, areCardsLocked: _areCardsLocked }) => {
       setDicePools(_dicePools)
       setCandles(_candles)
+      setAreCardsLocked(_areCardsLocked)
     })
 
     socket.on("candleChanged", ({ index, isLit, username }) => {

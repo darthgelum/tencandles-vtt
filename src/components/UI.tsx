@@ -165,9 +165,9 @@ export default function UI({ candles }: { candles: boolean[] }) {
       setAreCardsLocked(isLocked)
       toast(
         isLocked
-          ? "Card stacks are now locked.\nMouse over a user to see the top card of their stack."
+          ? "Card stacks are now locked. Mouse over a user to see the top card of their stack."
           : "Card starts are now unlocked.",
-        { duration: isLocked ? 5000 : undefined }
+        { duration: isLocked ? Infinity : undefined }
       )
 
       if (isLocked) socket.emit("updatePeerUserCards", { room, userId: user!.id, cards })
