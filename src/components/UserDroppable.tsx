@@ -77,7 +77,6 @@ export default function UserDroppable({
       </div>
       {showTopCards && (
         <>
-          {/* <div className="h-screen w-screen fixed bg-black opacity-70 z-50" /> */}
           <div className={clsx(characterCard && topCardInStack && "gap-4", "flex justify-center items-center z-50")}>
             {characterCard && (
               <div className={clsx(CARD_CLASSES, "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
@@ -87,7 +86,7 @@ export default function UserDroppable({
             )}
             {topCardInStack && (
               <div className={clsx(CARD_CLASSES, "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
-                {topCardInStack.type === CardType.Brink ? (
+                {topCardInStack.type === CardType.Brink && !topCardInStack.isRevealed ? (
                   <div className="flex justify-center items-center text-center w-full h-full text-lg">
                     {CardType.Brink}
                     <br />

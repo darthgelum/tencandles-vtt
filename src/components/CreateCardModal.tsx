@@ -14,7 +14,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
   const [content, setContent] = useState<string>("")
 
   function handleCreate() {
-    addCard({ id: nanoid(), type: type as CardType, content })
+    addCard({ id: nanoid(), type: type as CardType, content, isRevealed: type !== CardType.Brink })
     onClose()
   }
 

@@ -4,4 +4,5 @@ export default interface Card {
   id: string
   type: CardType
   content: string
+  isRevealed: boolean
 }

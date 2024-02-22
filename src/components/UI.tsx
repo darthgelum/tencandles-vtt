@@ -5,18 +5,7 @@ import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
-import {
-  TbFlame,
-  TbHelp,
-  TbHelpCircle,
-  TbLock,
-  TbLockOpen,
-  TbPencil,
-  TbQuestionMark,
-  TbTextCaption,
-  TbTextSize,
-  TbX,
-} from "react-icons/tb"
+import { TbFlame, TbHelp, TbLock, TbLockOpen, TbX } from "react-icons/tb"
 import User from "types/User"
 import { useUser } from "context/UserContext"
 import { getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
@@ -33,8 +22,9 @@ import GmAssignModal from "./GmAssignModal"
 import { CARD_CLASSES } from "utils/constants"
 import CharacterCard from "./CharacterCard"
 import HelpModal from "./HelpModal"
+import BrinkRevealModal from "./BrinkRevealModal"
 
-type UserIdToCards = { userId: string; cards: Card[] }
+type UserIdToCards = Record<string, Card[]>
 
 export default function UI({ candles }: { candles: boolean[] }) {
   const {
@@ -50,13 +40,14 @@ export default function UI({ candles }: { candles: boolean[] }) {
 
   const [users, setUsers] = useState<User[]>([])
   const [cards, setCards] = useState<Card[]>([])
-  const [peerUserCards, setPeerUserCards] = useState<UserIdToCards>()
+  const [peerUserCards, setPeerUserCards] = useState<UserIdToCards>({})
   const [showCreateCardModal, setShowCreateCardModal] = useState(false)
   const [showCards, setShowCards] = useState(false)
   const [draggingCard, setDraggingCard] = useState<Card | null>(null)
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null)
   const [showCandleModal, setShowCandleModal] = useState(false)
   const [showHelpModal, setShowHelpModal] = useState(false)
+  const [showBrinkRevealModal, setShowBrinkRevealModal] = useState(false)
   const [userToMakeGm, setUserToMakeGm] = useState<User | null>(null)
   const [isPixelFont, setIsPixelFont] = useState(true)
 
@@ -182,18 +173,37 @@ export default function UI({ candles }: { candles: boolean[] }) {
       if (isLocked) socket.emit("updatePeerUserCards", { room, userId: user!.id, cards })
     })
 
-    socket.on("peerUserCardsUpdated", ({ userId, cards: _cards }) => {
+    socket.on("peerUserCardsUpdated", ({ userId, cards: _cards, toastText }) => {
       setPeerUserCards((prevState) => {
         const newState = prevState ? { ...prevState } : ({} as UserIdToCards)
         newState[userId] = _cards
         return newState
       })
+      if (toastText) toast(toastText)
+    })
+
+    socket.on("brinkRevealed", ({ userId }) => {
+      const username = users.find((u) => u.id === userId)?.name
+
+      setPeerUserCards((prevState) => {
+        const newState = prevState ? { ...prevState } : ({} as UserIdToCards)
+        const brink = newState[userId].find((c) => c.type === CardType.Brink)
+        if (brink) {
+          brink.isRevealed = true
+        } else {
+          console.error(`Trying to reveal brink for user with id: ${username} but brink not found.`)
+        }
+        return newState
+      })
+      toast.success(`${username} revealed their Brink.`)
     })
 
     return () => {
       socket.removeAllListeners("usersUpdated")
       socket.removeAllListeners("cardTransferred")
       socket.removeAllListeners("lockChanged")
+      socket.removeAllListeners("peerUserCardsUpdated")
+      socket.removeAllListeners("brinkRevealed")
     }
   })
 
@@ -231,7 +241,6 @@ export default function UI({ candles }: { candles: boolean[] }) {
 
   useEffect(() => {
     if (needsToUpdatePeersAfterUpdatingCharacterCard && areCardsLocked) {
-      console.log("emit")
       socket.emit("updatePeerUserCards", { room, userId: user!.id, cards })
       setNeedsToUpdatePeersAfterUpdatingCharacterCard(false)
     }
@@ -249,6 +258,31 @@ export default function UI({ candles }: { candles: boolean[] }) {
       return newState
     })
     setNeedsToUpdatePeersAfterUpdatingCharacterCard(true)
+  }
+
+  function handleConfirmBrinkReveal() {
+    setShowBrinkRevealModal(false)
+    const newCards = [...cards]
+    const brink = newCards.find((c) => c.type === CardType.Brink)
+    if (brink) {
+      brink.isRevealed = true
+    } else {
+      console.error(`Trying to reveal Brink but the Brink card not found.`)
+    }
+
+    socket.emit("updatePeerUserCards", {
+      room,
+      userId: user!.id,
+      cards: newCards,
+      toastText: `${user!.name} revealed their Brink.`,
+    })
+
+    setCards((prevState) => {
+      const newState = [...prevState]
+      const brink = newState.find((c) => c.type === CardType.Brink)
+      if (brink) brink.isRevealed = true
+      return newState
+    })
   }
 
   const characterCard = cards.find((c) => c.type === CardType.Character)
@@ -304,15 +338,14 @@ export default function UI({ candles }: { candles: boolean[] }) {
                   <div className={clsx(!characterCard && "-mt-28", "card-stack z-50")}>
                     {cards
                       .filter((c) => c.type !== CardType.Character)
-                      .map((card) => (
+                      .map((card, i) => (
                         <CardDraggable
                           key={card.id}
                           card={card}
                           areCardsLocked={areCardsLocked}
-                          onDelete={() => {
-                            setCardToDelete(card)
-                            // setShowCards(false)
-                          }}
+                          isTopOfStack={i === cards.length - (characterCard ? 2 : 1)}
+                          onDelete={() => setCardToDelete(card)}
+                          onRevealBrink={() => setShowBrinkRevealModal(true)}
                         />
                       ))}
                   </div>
@@ -357,7 +390,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
               key={u.id}
               user={u}
               currentUser={user!}
-              cards={peerUserCards?.[u.id]}
+              cards={peerUserCards[u.id]}
               areCardsLocked={areCardsLocked}
               onOpenCardStack={() => {
                 setShowCards(true)
@@ -411,6 +444,9 @@ export default function UI({ candles }: { candles: boolean[] }) {
           onSwitchFont={() => setIsPixelFont((prevState) => !prevState)}
           onClose={() => setShowHelpModal(false)}
         />
+      )}
+      {showBrinkRevealModal && (
+        <BrinkRevealModal onConfirm={handleConfirmBrinkReveal} onCancel={() => setShowBrinkRevealModal(false)} />
       )}
     </DndContext>
   )

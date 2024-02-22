@@ -2,19 +2,22 @@ import { useState } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import clsx from "clsx"
-import { TbX } from "react-icons/tb"
+import { TbEye, TbX } from "react-icons/tb"
 import Card from "types/Card"
 import { CARD_CLASSES } from "utils/constants"
+import CardType from "enums/CardType"
 
 const xShift = 40
 
 type Props = {
   card: Card
   areCardsLocked: boolean
+  isTopOfStack: boolean
   onDelete: () => void
+  onRevealBrink: () => void
 }
 
-export default function CardDraggable({ card, areCardsLocked, onDelete }: Props) {
+export default function CardDraggable({ card, areCardsLocked, isTopOfStack, onDelete, onRevealBrink }: Props) {
   const [isDragDisabled, setIsDragDisabled] = useState(false)
 
   const {
@@ -31,7 +34,7 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
   } = useSortable({
     id: card.id,
     data: { card },
-    disabled: isDragDisabled,
+    disabled: isDragDisabled || areCardsLocked,
   })
 
   const isBehindDraggingCard = index > activeIndex && index <= overIndex
@@ -47,6 +50,11 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
     marginLeft: index * -30,
   }
 
+  let title: string = card.type
+  if (card.type === CardType.Brink && areCardsLocked) {
+    title = card.isRevealed ? "Brink (revealed)" : "Brink (hidden)"
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -56,23 +64,30 @@ export default function CardDraggable({ card, areCardsLocked, onDelete }: Props)
       className={clsx(
         isSorting && "opacity-70",
         isDragging && "!opacity-0",
-        areCardsLocked ? "hover:z-[999]" : "hover:-translate-y-2",
+        areCardsLocked ? "hover:z-[999] cursor-default" : "hover:-translate-y-2",
         CARD_CLASSES,
         "mb-[-168px] translate-y-0"
       )}
     >
-      {!areCardsLocked && (
-        <button
-          className="absolute top-2 right-2 p-1 hover:text-red"
-          onClick={onDelete}
-          // this prevents clicking delete button from starting drag
-          onMouseEnter={() => setIsDragDisabled(true)}
-          onMouseLeave={() => setIsDragDisabled(false)}
-        >
-          <TbX className="h-6 w-6" />
-        </button>
+      {(!areCardsLocked || isTopOfStack) && (
+        <div className="absolute top-2 right-2 ">
+          {card.type === CardType.Brink && areCardsLocked && !card.isRevealed && (
+            <button className="p-1 hover:text-blue" onClick={onRevealBrink}>
+              <TbEye className="h-6 w-6" />
+            </button>
+          )}
+          <button
+            className="p-1 hover:text-red"
+            onClick={onDelete}
+            // this prevents clicking delete button from starting drag
+            onMouseEnter={() => setIsDragDisabled(true)}
+            onMouseLeave={() => setIsDragDisabled(false)}
+          >
+            <TbX className="h-6 w-6" />
+          </button>
+        </div>
       )}
-      <div className="text-lg">{card.type}</div>
+      <div className="text-lg">{title}</div>
       <div className="mt-3 text-sm">{card.content}</div>
     </div>
   )
