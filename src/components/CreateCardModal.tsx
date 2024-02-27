@@ -18,11 +18,6 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
     onClose()
   }
 
-  function isOptionDisabled(cardType) {
-    if (cardType !== CardType.Character) return false
-    return cards.some((c) => c.type === cardType)
-  }
-
   return (
     <>
       <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={onClose} />
