@@ -78,7 +78,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
       !completedOnboardingStages.includes(OnboardingStage.GmButtons) &&
       currentOnboardingStage !== OnboardingStage.GmButtons
     ) {
-      startOnboardingStage(OnboardingStage.GmButtons)
+      // startOnboardingStage(OnboardingStage.GmButtons)
     }
   }, [
     cards,
@@ -374,7 +374,10 @@ export default function UI({ candles }: { candles: boolean[] }) {
                 <TbHelp className="h-12 w-12 mt-1" />
               </button>
             </a>
-            <a data-tooltip-id="tooltip" data-tooltip-content="Toggle font">
+            <a
+              data-tooltip-id="tooltip"
+              data-tooltip-content={isPixelFont ? "Switch to normal font" : "Switch to pixel font"}
+            >
               <button
                 onClick={() => setIsPixelFont((prevState) => !prevState)}
                 className="text-4xl w-12 text-yellow ml-1 mb-1 -mr-1 hover:brightness-110"
@@ -384,14 +387,14 @@ export default function UI({ candles }: { candles: boolean[] }) {
             </a>
             {user?.isGm && (
               <div className="gm-btns">
-                <a data-tooltip-id="tooltip" data-tooltip-content="Change candle duration">
+                <a data-tooltip-id="tooltip" data-tooltip-content="Change candle duration (GM only)">
                   <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110">
                     <TbFlame className="btn_flame h-12 w-12" />
                   </button>
                 </a>
                 <a
                   data-tooltip-id="tooltip"
-                  data-tooltip-content={areCardsLocked ? "Unlock card stacks" : "Lock card stacks"}
+                  data-tooltip-content={areCardsLocked ? "Unlock card stacks (GM only)" : "Lock card stacks (GM only)"}
                 >
                   <button
                     onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}

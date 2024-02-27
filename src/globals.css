@@ -46,7 +46,7 @@ ul {
 }
 
 .reactour__popover {
-  @apply !bg-grey !p-5 !max-w-[400px] border-4 border-yellow;
+  @apply !bg-grey !p-5 !pr-7 !max-w-[400px] border-4 border-yellow font-sans;
 }
 
 .reactour__close-button {
