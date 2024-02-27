@@ -62,7 +62,8 @@ export default function Room() {
 
       socket.on("disconnect", () => {
         toast(
-          "You've been disconnected. Try refreshing the page and joining again with the same username. If you use a different username, you'll lose your cards."
+          "You've been disconnected. Try refreshing the page and joining again with the same username. If you use a different username, you'll lose your cards.",
+          { duration: Infinity }
         )
       })
     }

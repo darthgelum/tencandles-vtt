@@ -19,7 +19,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
   }
 
   function isOptionDisabled(cardType) {
-    if (cardType === CardType.Vice || cardType === CardType.Virtue) return false
+    if (cardType !== CardType.Character) return false
     return cards.some((c) => c.type === cardType)
   }
 
@@ -36,7 +36,11 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
             Select a card type
           </option>
           {Object.values(CardType).map((cardType) => (
-            <option key={cardType} value={cardType} disabled={isOptionDisabled(cardType)}>
+            <option
+              key={cardType}
+              value={cardType}
+              disabled={cardType === CardType.Character && cards.some((c) => c.type === CardType.Character)}
+            >
               {cardType}
             </option>
           ))}
