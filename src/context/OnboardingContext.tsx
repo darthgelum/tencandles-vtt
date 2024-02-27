@@ -41,7 +41,7 @@ export function OnboardingRootProvider({ children }) {
       beforeClose={() => {
         setCompletedOnboardingStages([...completedOnboardingStages, currentOnboardingStage])
       }}
-      onClickHighlighted={(e, clickProps) => {
+      onClickHighlighted={(_e, clickProps) => {
         if (clickProps.currentStep === clickProps.steps!.length - 1) {
           clickProps.setIsOpen(false)
         }
