@@ -1,4 +1,3 @@
-import { TbX } from "react-icons/tb"
 import Card from "types/Card"
 import { CARD_CLASSES } from "utils/constants"
 
@@ -15,9 +14,6 @@ export default function DeleteCardModal({ card, onDelete, onCancel }: Props) {
       <div className="flex flex-col gap-4 justify-center items-center text-white z-50 fixed w-fit h-fit text-lg bg-grey px-8 py-6">
         Are you sure you want to burn this card?
         <div className={CARD_CLASSES}>
-          <div className="absolute top-3 right-3">
-            <TbX className="h-6 w-6" />
-          </div>
           <div className="text-lg">{card.type}</div>
           <div className="mt-3 text-sm">{card.content}</div>
         </div>

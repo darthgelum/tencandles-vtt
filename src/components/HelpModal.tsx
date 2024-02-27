@@ -1,4 +1,5 @@
 import { TbEye, TbFlame, TbPencil, TbX } from "react-icons/tb"
+import { RiCandleLine } from "react-icons/ri"
 
 export default function HelpModal({ onClose }: { onClose: () => void; onSwitchFont: () => void }) {
   return (
@@ -21,8 +22,9 @@ export default function HelpModal({ onClose }: { onClose: () => void; onSwitchFo
                 If you need to, click on another player to make them the <strong>GM</strong> instead.
               </li>
               <li>
-                You can adjust how long each candle lasts by clicking <TbFlame className="inline w-7 h-7 text-yellow" />{" "}
-                in the top right corner (only the <strong>GM</strong> can see this).
+                You can adjust how long each candle lasts by clicking{" "}
+                <RiCandleLine className="inline w-7 h-7 text-yellow" /> in the top right corner (only the{" "}
+                <strong>GM</strong> can see this).
               </li>
             </ul>
 
@@ -58,13 +60,13 @@ export default function HelpModal({ onClose }: { onClose: () => void; onSwitchFo
                 Click your name (at the bottom of the screen) to view your cards. Here, you can:
                 <ul className="mt-2">
                   <li>
-                    Edit your Character/Inventory card by clicking <TbPencil className="inline w-6 h-6" />
+                    Edit your Character/Inventory card by clicking <TbPencil className="inline w-7 h-7" />
                   </li>
                   <li>
-                    Burn the active (top) card in your stack by clicking <TbX className="inline w-6 h-6" />
+                    Burn the active (top) card in your stack by clicking <TbFlame className="inline w-7 h-7" />
                   </li>
                   <li>
-                    Reveal your Brink if it's active by clicking <TbEye className="inline w-6 h-6" />
+                    Reveal your Brink if it's active by clicking <TbEye className="inline w-7 h-7" />
                   </li>
                 </ul>
               </li>

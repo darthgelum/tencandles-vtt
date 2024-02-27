@@ -6,7 +6,8 @@ import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import socket from "utils/socket"
-import { TbFlame, TbHelp, TbLock, TbLockOpen, TbX } from "react-icons/tb"
+import { TbFlame, TbHelp, TbLock, TbLockOpen } from "react-icons/tb"
+import { RiCandleLine } from "react-icons/ri"
 import User from "types/User"
 import { useUser } from "context/UserContext"
 import { getUserPositionClasses, prioritizeUserCollisions } from "utils/helpers"
@@ -318,8 +319,8 @@ export default function UI({ candles }: { candles: boolean[] }) {
         {draggingCard ? (
           <div className={CARD_CLASSES}>
             {!areCardsLocked && (
-              <div className="absolute top-3 right-3">
-                <TbX className="h-6 w-6" />
+              <div className="absolute top-2.5 right-2.5">
+                <TbFlame className="h-7 w-7" />
               </div>
             )}
             <div className="">{draggingCard.type}</div>
@@ -389,7 +390,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
               <div className="gm-btns">
                 <a data-tooltip-id="tooltip" data-tooltip-content="Change candle duration (GM only)">
                   <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110">
-                    <TbFlame className="btn_flame h-12 w-12" />
+                    <RiCandleLine className="btn_flame h-12 w-12" />
                   </button>
                 </a>
                 <a

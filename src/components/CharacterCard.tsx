@@ -2,7 +2,7 @@ import clsx from "clsx"
 import { useUser } from "context/UserContext"
 import CardType from "enums/CardType"
 import { useState } from "react"
-import { TbCheck, TbPencil, TbX } from "react-icons/tb"
+import { TbCheck, TbFlame, TbPencil } from "react-icons/tb"
 import { CgUndo } from "react-icons/cg"
 import Card from "types/Card"
 import { CARD_CLASSES } from "utils/constants"
@@ -38,21 +38,21 @@ export default function CharacterCard({
       <div className="absolute top-2 right-2">
         {isEditing ? (
           <>
-            <button className="hover:text-red p-1" onClick={handleRevert}>
-              <CgUndo className="h-6 w-6" />
+            <button className="hover:text-red p-0.5" onClick={handleRevert}>
+              <CgUndo className="h-7 w-7" />
             </button>
-            <button className="hover:text-green p-1" onClick={handleSave}>
-              <TbCheck className="h-6 w-6" />
+            <button className="hover:text-green p-0.5" onClick={handleSave}>
+              <TbCheck className="h-7 w-7" />
             </button>
           </>
         ) : (
           <>
-            <button className="hover:text-blue p-1" onClick={() => setIsEditing(true)}>
-              <TbPencil className="h-6 w-6" />
+            <button className="hover:text-blue p-0.5" onClick={() => setIsEditing(true)}>
+              <TbPencil className="h-7 w-7" />
             </button>
             {!areCardsLocked && (
-              <button className="hover:text-red p-1" onClick={onDelete}>
-                <TbX className="h-6 w-6" />
+              <button className="hover:text-red p-0.5" onClick={onDelete}>
+                <TbFlame className="h-7 w-7" />
               </button>
             )}
           </>

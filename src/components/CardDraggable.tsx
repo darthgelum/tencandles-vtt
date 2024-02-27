@@ -2,7 +2,8 @@ import { useState } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import clsx from "clsx"
-import { TbEye, TbX } from "react-icons/tb"
+import { TbEye, TbFlame } from "react-icons/tb"
+import { RiEyeLine } from "react-icons/ri"
 import Card from "types/Card"
 import { CARD_CLASSES } from "utils/constants"
 import CardType from "enums/CardType"
@@ -70,20 +71,20 @@ export default function CardDraggable({ card, areCardsLocked, isTopOfStack, onDe
       )}
     >
       {(!areCardsLocked || isTopOfStack) && (
-        <div className="absolute top-2 right-2 ">
+        <div className="absolute top-2 right-2">
           {card.type === CardType.Brink && areCardsLocked && !card.isRevealed && (
-            <button className="p-1 hover:text-blue" onClick={onRevealBrink}>
-              <TbEye className="h-6 w-6" />
+            <button className="p-0.5 hover:text-blue" onClick={onRevealBrink}>
+              <TbEye className="h-7 w-7" />
             </button>
           )}
           <button
-            className="p-1 hover:text-red"
+            className="p-0.5 hover:text-red"
             onClick={onDelete}
             // this prevents clicking delete button from starting drag
             onMouseEnter={() => setIsDragDisabled(true)}
             onMouseLeave={() => setIsDragDisabled(false)}
           >
-            <TbX className="h-6 w-6" />
+            <TbFlame className="h-7 w-7" />
           </button>
         </div>
       )}
