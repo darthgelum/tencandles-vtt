@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom"
 import { nanoid } from "nanoid"
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "utils/constants"
 import SmallScreenModal from "./SmallScreenModal"
+import Footer from "./Footer"
 
 export default function Lobby({ room }: { room?: string }) {
   const navigate = useNavigate()
@@ -87,6 +88,7 @@ export default function Lobby({ room }: { room?: string }) {
           {buttonText}
         </button>
       </form>
+      <Footer />
       {showSmallScreenModal && <SmallScreenModal onClose={() => setShowSmallScreenModal(false)} />}
     </>
   )

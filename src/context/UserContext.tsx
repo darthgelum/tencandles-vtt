@@ -17,7 +17,7 @@ type ProviderValue = {
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>()
   const [areCardsLocked, setAreCardsLocked] = useState(false)
-  const [candleLifetime, setCandleLifetime] = useState(14400) // 4 hours in seconds
+  const [candleLifetime, setCandleLifetime] = useState(12600) // 3.5 hours in seconds
 
   const providerValue = useMemo(
     () => ({
