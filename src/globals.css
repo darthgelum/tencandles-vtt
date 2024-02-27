@@ -12,6 +12,10 @@
   src: url("../fonts/verdana.ttf");
 }
 
+:root {
+  color-scheme: only dark;
+}
+
 body,
 html {
   @apply h-screen w-screen overflow-hidden;
