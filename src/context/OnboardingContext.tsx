@@ -39,7 +39,6 @@ export function OnboardingRootProvider({ children }) {
       showNavigation={ONBOARDING_STEPS[currentOnboardingStage].length > 1}
       padding={currentOnboardingStage === OnboardingStage.MultipleCards ? 50 : undefined}
       beforeClose={() => {
-        console.log(completedOnboardingStages, currentOnboardingStage)
         setCompletedOnboardingStages([...completedOnboardingStages, currentOnboardingStage])
       }}
       onClickHighlighted={(e, clickProps) => {
@@ -90,11 +89,6 @@ function OnboardingProvider({ children }) {
         setSteps!(ONBOARDING_STEPS[stage])
         setCurrentStep(0)
         setIsOnboardingOpen(true)
-        // hack to prevent GmButtons stage from appearing twice
-        // if (ONBOARDING_STEPS[stage].length === 1) {
-        //   console.log("add")
-        //   setCompletedOnboardingStages([...completedOnboardingStages, stage])
-        // }
       },
       setIsOnboardingOpen,
       isOnboardingOpen,

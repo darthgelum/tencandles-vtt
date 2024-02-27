@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         position="bottom-right"
         toastOptions={{
           className: "!bg-[rgba(60,60,60)] !text-white !p-4 max-w-[600px] leading-relaxed",
-          duration: 2000,
+          duration: 4000,
         }}
       >
         {(t) => (
@@ -57,7 +57,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <>
                 {message}
                 <button onClick={() => toast.dismiss(t.id)}>
-                  <TbX className="text-white h-5 w-5" />
+                  <TbX className="text-white h-6 w-6 hover:text-red" />
                 </button>
               </>
             )}

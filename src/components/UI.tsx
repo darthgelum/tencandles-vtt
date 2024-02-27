@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useParams } from "react-router-dom"
+import { Tooltip } from "react-tooltip"
 import clsx from "clsx"
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable"
@@ -135,7 +136,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
   }, [cardToDelete, showCandleModal, showCards, showCreateCardModal, showHelpModal])
 
   useEffect(() => {
-    socket.on("usersUpdated", ({ updatedUsers, toastText }) => {
+    socket.on("usersUpdated", ({ updatedUsers, toastText, isToastInfinite }) => {
       // reorder users so that this user is first in the array
       const reorderedUsers: User[] = []
       const userIndex = updatedUsers.findIndex((u) => u.id === user!.id)
@@ -148,8 +149,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
 
       const updatedCurrentUser = updatedUsers[userIndex]
       setUser(updatedCurrentUser)
-
-      if (toastText) toast(toastText)
+      if (toastText) toast(toastText, { duration: isToastInfinite ? Infinity : undefined })
 
       // if (user!.isGm) socket.emit("passInitialPeerUserCards", { room, dicePools, candles })
     })
@@ -166,7 +166,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
       toast(
         isLocked
           ? "Card stacks are now locked. Mouse over a user to see the top card of their stack."
-          : "Card starts are now unlocked.",
+          : "Card stacks are now unlocked.",
         { duration: isLocked ? Infinity : undefined }
       )
 
@@ -260,6 +260,21 @@ export default function UI({ candles }: { candles: boolean[] }) {
     setNeedsToUpdatePeersAfterUpdatingCharacterCard(true)
   }
 
+  function handleDeleteCard() {
+    const updatedCards = cards.filter((card) => card.id !== cardToDelete!.id)
+    if (areCardsLocked) {
+      socket.emit("updatePeerUserCards", {
+        room,
+        userId: user!.id,
+        cards: updatedCards,
+        toastText: `${user!.name} burned their ${cardToDelete!.type}.`,
+      })
+    }
+    setCardToDelete(null)
+    setShowCards(true)
+    setCards((prevState) => prevState.filter((card) => card.id !== cardToDelete!.id))
+  }
+
   function handleConfirmBrinkReveal() {
     setShowBrinkRevealModal(false)
     const newCards = [...cards]
@@ -321,9 +336,9 @@ export default function UI({ candles }: { candles: boolean[] }) {
                 <div className="flex justify-center items-center text-lg z-50 bg-grey p-6 leading-loose">
                   You don't have any cards yet.
                   <br />
-                  Start by clicking the "Add Card" button in the top right.
+                  Start by clicking "Add Card" in the top right corner.
                   <br />
-                  Or click anywhere to go back to the game.
+                  Or click anywhere to go back to the table.
                 </div>
               ) : (
                 <div className={clsx(characterCard && cards.length > 1 && "gap-24", "flex")}>
@@ -353,36 +368,51 @@ export default function UI({ candles }: { candles: boolean[] }) {
               )}
             </>
           )}
-          <div className="absolute top-2 right-2 z-50 flex items-center">
+          <div className="absolute top-2 left-2 z-50 flex items-center">
+            <a data-tooltip-id="tooltip" data-tooltip-content="View full instructions">
+              <button onClick={() => setShowHelpModal(true)} className="text-yellow  hover:brightness-110">
+                <TbHelp className="h-12 w-12 mt-1" />
+              </button>
+            </a>
+            <a data-tooltip-id="tooltip" data-tooltip-content="Toggle font">
+              <button
+                onClick={() => setIsPixelFont((prevState) => !prevState)}
+                className="text-4xl w-12 text-yellow ml-1 mb-1 -mr-1 hover:brightness-110"
+              >
+                A
+              </button>
+            </a>
             {user?.isGm && (
               <div className="gm-btns">
-                <button
-                  onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}
-                  className="btn_lock text-yellow hover:brightness-110"
+                <a data-tooltip-id="tooltip" data-tooltip-content="Change candle duration">
+                  <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110">
+                    <TbFlame className="btn_flame h-12 w-12" />
+                  </button>
+                </a>
+                <a
+                  data-tooltip-id="tooltip"
+                  data-tooltip-content={areCardsLocked ? "Unlock card stacks" : "Lock card stacks"}
                 >
-                  {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
-                </button>
-                <button onClick={() => setShowCandleModal(true)} className="text-yellow hover:brightness-110">
-                  <TbFlame className="btn_flame h-12 w-12" />
-                </button>
+                  <button
+                    onClick={() => socket.emit("changeLock", { isLocked: !areCardsLocked, room })}
+                    className="btn_lock text-yellow hover:brightness-110"
+                  >
+                    {areCardsLocked ? <TbLock className="h-12 w-12" /> : <TbLockOpen className="h-12 w-12" />}
+                  </button>
+                </a>
               </div>
             )}
-            <button onClick={() => setShowHelpModal(true)} className="text-yellow  hover:brightness-110">
-              <TbHelp className="h-12 w-12" />
-            </button>
-            <button
-              onClick={() => setIsPixelFont((prevState) => !prevState)}
-              className="text-4xl w-12 text-yellow mr-2 hover:brightness-110"
-            >
-              A
-            </button>
-            <button
-              className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
-              disabled={areCardsLocked}
-              onClick={() => setShowCreateCardModal(true)}
-            >
-              Add Card
-            </button>
+          </div>
+          <div className="absolute top-2 right-2 z-50">
+            <a data-tooltip-id="tooltip_add-card" data-tooltip-content="Card stacks are currently locked">
+              <button
+                className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
+                disabled={areCardsLocked}
+                onClick={() => setShowCreateCardModal(true)}
+              >
+                Add Card
+              </button>
+            </a>
           </div>
           {/* users */}
           {users.map((u, i) => (
@@ -404,6 +434,10 @@ export default function UI({ candles }: { candles: boolean[] }) {
           ))}
         </div>
       </SortableContext>
+
+      <Tooltip className="!bg-lightgrey z-[9999]" id="tooltip" place="bottom-start" />
+      {areCardsLocked && <Tooltip className="!bg-lightgrey z-[9999]" id="tooltip_add-card" place="left" />}
+
       {showCreateCardModal && (
         <CreateCardModal
           cards={cards}
@@ -417,11 +451,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
       {cardToDelete && (
         <DeleteCardModal
           card={cardToDelete}
-          onDelete={() => {
-            setCards((prevState) => prevState.filter((card) => card.id !== cardToDelete.id))
-            setCardToDelete(null)
-            setShowCards(true)
-          }}
+          onDelete={handleDeleteCard}
           onCancel={() => {
             setCardToDelete(null)
             setShowCards(true)

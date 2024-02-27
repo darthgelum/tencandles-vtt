@@ -33,7 +33,9 @@ export default function Room() {
     if (user?.id && !completedOnboardingStages.includes(OnboardingStage.Table)) {
       startOnboardingStage(OnboardingStage.Table)
     }
-  }, [user?.id, completedOnboardingStages, startOnboardingStage])
+    // adding startOnboardingStage as a dependency creates a bug where the table tutorial restarts immediately after ending closing onboarding
+    // eslint-disable-next-line
+  }, [user?.id, completedOnboardingStages])
 
   const transferDieToNewPool = useCallback((dieId, prevDicePool, newDicePool) => {
     setDicePools((prevState) => {
@@ -191,9 +193,9 @@ export default function Room() {
         className="bg-[url('/wood.png')] bg-[length:250px] absolute w-full h-full rounded-[100%] shadow-[0_0_50px_70px_rgba(16,16,15,1)_inset] outline outline-black"
         style={{ imageRendering: "pixelated" }}
       />
-      <p className="absolute top-1 left-2 text-xs text-lightgrey">
+      {/* <p className="absolute top-1 left-2 text-xs text-lightgrey">
         To invite players to join this room, send them this page’s URL.
-      </p>
+      </p> */}
       <div
         style={{ opacity: `${darknessOpacity}` }}
         className="pointer-events-none bg-[#000000] w-screen h-screen fixed"

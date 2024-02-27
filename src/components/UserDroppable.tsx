@@ -65,7 +65,6 @@ export default function UserDroppable({
           )}
           onClick={handleClick}
           onMouseEnter={() => {
-            console.log("etner")
             if (areCardsLocked) setShowTopCards(true)
           }}
           onMouseLeave={() => {
