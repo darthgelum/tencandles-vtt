@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { getRoomName } from "utils/helpers"
 import { useUser } from "context/UserContext"
 import { useNavigate } from "react-router-dom"
 import { nanoid } from "nanoid"
+import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from "utils/constants"
+import SmallScreenModal from "./SmallScreenModal"
 
 export default function Lobby({ room }: { room?: string }) {
   const navigate = useNavigate()
@@ -13,6 +15,13 @@ export default function Lobby({ room }: { room?: string }) {
   const [username, setusername] = useState("")
   const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
+  const [showSmallScreenModal, setShowSmallScreenModal] = useState(false)
+
+  useEffect(() => {
+    if (window.innerHeight <= MIN_WINDOW_HEIGHT || window.innerWidth <= MIN_WINDOW_WIDTH) {
+      setShowSmallScreenModal(true)
+    }
+  }, [])
 
   async function handleJoin(e) {
     e.preventDefault()
@@ -78,7 +87,7 @@ export default function Lobby({ room }: { room?: string }) {
           {buttonText}
         </button>
       </form>
-      {/* <Footer /> */}
+      {showSmallScreenModal && <SmallScreenModal onClose={() => setShowSmallScreenModal(false)} />}
     </>
   )
 }

@@ -2,14 +2,13 @@ import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import toast, { ToastBar, Toaster } from "react-hot-toast"
 import { keyframes } from "goober"
+import { TbX } from "react-icons/tb"
 import "globals.css"
 import Lobby from "components/Lobby"
 import ErrorPage from "components/ErrorPage"
 import Room from "components/Room"
 import { UserProvider } from "context/UserContext"
-import Test from "components/Test"
 import { OnboardingRootProvider } from "context/OnboardingContext"
-import { TbX } from "react-icons/tb"
 
 const router = createBrowserRouter([
   {
@@ -20,10 +19,6 @@ const router = createBrowserRouter([
   {
     path: "room/:room",
     element: <Room />,
-  },
-  {
-    path: "test",
-    element: <Test />,
   },
 ])
 
