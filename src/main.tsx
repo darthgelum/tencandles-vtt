@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Toaster
         position="bottom-right"
         toastOptions={{
-          className: "!bg-[rgba(60,60,60)] !text-white !p-4 max-w-[450px] leading-relaxed",
+          className: "!bg-[rgba(60,60,60)] !text-white !p-4 max-w-[400px] leading-relaxed",
           duration: 4000,
         }}
       >
@@ -49,12 +49,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             }}
           >
             {({ message }) => (
-              <>
+              <button className="group flex items-center text-left" onClick={() => toast.dismiss(t.id)}>
                 {message}
-                <button onClick={() => toast.dismiss(t.id)}>
-                  <TbX className="text-white h-6 w-6 hover:text-red" />
-                </button>
-              </>
+                <div>
+                  <TbX className="text-white h-6 w-6 group-hover:text-red" />
+                </div>
+              </button>
             )}
           </ToastBar>
         )}

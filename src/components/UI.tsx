@@ -209,7 +209,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
   })
 
   useEffect(() => {
-    document.documentElement.style.fontFamily = isPixelFont ? "PixelMix" : "Verdana"
+    document.documentElement.style.fontFamily = isPixelFont ? "PixeloidSans" : "Verdana"
   }, [isPixelFont])
 
   function handleCardDragEnd(event: DragEndEvent) {
@@ -323,8 +323,8 @@ export default function UI({ candles }: { candles: boolean[] }) {
                 <TbFlame className="h-7 w-7" />
               </div>
             )}
-            <div className="">{draggingCard.type}</div>
-            <div className="text-sm mt-3">{draggingCard.content}</div>
+            <div className="text-xl">{draggingCard.type}</div>
+            <div className="mt-3">{draggingCard.content}</div>
           </div>
         ) : null}
       </DragOverlay>
@@ -334,7 +334,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
             <>
               <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={() => setShowCards(false)} />
               {cards.length === 0 ? (
-                <div className="flex justify-center items-center text-lg z-50 bg-grey p-6 leading-loose">
+                <div className="flex justify-center items-center text-xl z-50 bg-grey p-6 leading-loose">
                   You don't have any cards yet.
                   <br />
                   Start by clicking "Add Card" in the top right corner.
@@ -372,7 +372,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
           <div className="absolute top-2 left-2 z-50 flex items-center">
             <a data-tooltip-id="tooltip" data-tooltip-content="View full instructions">
               <button onClick={() => setShowHelpModal(true)} className="text-yellow  hover:brightness-110">
-                <TbHelp className="h-12 w-12 mt-1" />
+                <TbHelp className="h-12 w-12 mt-0.5" />
               </button>
             </a>
             <a
@@ -381,7 +381,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
             >
               <button
                 onClick={() => setIsPixelFont((prevState) => !prevState)}
-                className="text-4xl w-12 text-yellow ml-1 mb-1 -mr-1 hover:brightness-110"
+                className="text-[2.6rem] w-12 text-yellow -mr-1 hover:brightness-110"
               >
                 A
               </button>
@@ -410,7 +410,7 @@ export default function UI({ candles }: { candles: boolean[] }) {
           <div className="absolute top-2 right-2 z-50">
             <a data-tooltip-id="tooltip_add-card" data-tooltip-content="Card stacks are currently locked">
               <button
-                className="text-black bg-yellow p-3 hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
+                className="btn text-black bg-yellow !py-3"
                 disabled={areCardsLocked}
                 onClick={() => setShowCreateCardModal(true)}
               >

@@ -1,7 +1,7 @@
 import OnboardingStage from "enums/OnboardingStage"
 
 export const MIN_WINDOW_HEIGHT = 700
-export const MIN_WINDOW_WIDTH = 960
+export const MIN_WINDOW_WIDTH = 947
 
 export const HOPE_DIE_ID = 11
 

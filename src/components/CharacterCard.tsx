@@ -58,16 +58,16 @@ export default function CharacterCard({
           </>
         )}
       </div>
-      <div className="text-lg">{CardType.Character}</div>
+      <div className="text-xl">{CardType.Character}</div>
       {isEditing ? (
         <textarea
           value={currentContent}
           onChange={(e) => setCurrentContent(e.target.value)}
-          className="bg-[transparent] border-black mt-3 w-full text-sm p-0"
-          rows={7}
+          className="bg-[transparent] border-black mt-3 w-full p-0"
+          rows={6}
         />
       ) : (
-        <div className="text-sm mt-3">{currentContent}</div>
+        <div className="mt-3">{currentContent}</div>
       )}
     </div>
   )

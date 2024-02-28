@@ -23,7 +23,7 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
       <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={onClose} />
       <div className="flex flex-col p-4 bg-yellow w-[500px] z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black">
         <select
-          className="block p-2 border border-black bg-[transparent] w-full text-lg"
+          className="block p-2 border border-black bg-[transparent] w-full text-xl"
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
@@ -44,18 +44,14 @@ export default function CreateCardModal({ cards, addCard, onClose }: Props) {
           placeholder="Enter details here"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="bg-[transparent] border-black mt-2 w-full placeholder:text-[rgba(0,0,0,0.4)]"
-          rows={7}
+          className="text-lg bg-[transparent] border-black mt-2 w-full placeholder:text-[rgba(0,0,0,0.4)]"
+          rows={6}
         />
         <div className="mt-2 flex justify-end gap-4">
-          <button className="hover:text-blue" onClick={onClose}>
+          <button className="text-lg hover:text-blue" onClick={onClose}>
             Cancel
           </button>
-          <button
-            disabled={!type}
-            className="px-3 py-2 bg-blue text-white hover:brightness-125 disabled:opacity-60 disabled:hover:brightness-100"
-            onClick={handleCreate}
-          >
+          <button disabled={!type} className="btn text-white bg-blue" onClick={handleCreate}>
             Create
           </button>
         </div>

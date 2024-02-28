@@ -31,12 +31,12 @@ export default function DicePoolDroppable({
   return (
     <div ref={setNodeRef} className={clsx(isOver && "bg-orangeTransparent", moreClasses)}>
       <div className="flex items-center justify-center gap-4">
-        <h2 className="text-center text-lg">{dicePool}</h2>
+        <h2 className="text-center text-xl">{dicePool}</h2>
         {showRollButton && (
           <button
             onClick={onRoll}
             disabled={dice.length === 0}
-            className="bg-yellow text-black text-lg px-4 pb-3 pt-2.5 hover:brightness-[110%]"
+            className="btn !text-xl bg-yellow text-black !py-2.5 !px-[1.1rem]"
           >
             Roll
           </button>

@@ -22,7 +22,7 @@ export default {
         xs: "480px",
       },
       fontFamily: {
-        pixel: ["PixelMix"],
+        pixel: ["PixeloidSans"],
       },
       fontSize: {
         "1.5xl": "1.35rem",

@@ -73,17 +73,17 @@ export default function Lobby({ room }: { room?: string }) {
         onSubmit={handleJoin}
         className="text-white h-screen p-4 flex flex-col justify-center items-center text-lg xs:text-xl"
       >
-        <h1 className="text-center text-4xl xs:text-6xl mt-8 mb-6 text-yellow">Ten Candles</h1>
-        {text && <div className="text-sm xs:text-base text-center mb-2 max-w-[450px]">{text}</div>}
+        <h1 className="text-center text-5xl xs:text-7xl mb-6 text-yellow">Ten Candles</h1>
+        {text && <div className="xs:text-lg text-center mb-2 max-w-[450px]">{text}</div>}
         <input
           placeholder="Enter your name"
           onChange={(e) => setusername(e.target.value)}
-          className="text-yellow my-3 focus:border-yellow focus:ring-yellow w-full sm:w-96 p-2 py-3 bg-[transparent] border-2 border-yellow text-center placeholder:text-yellow placeholder:opacity-60"
+          className="text-xl text-yellow my-3 focus:border-yellow focus:ring-yellow w-full sm:w-96 p-2 py-3 bg-[transparent] border-2 border-yellow text-center placeholder:text-yellow placeholder:opacity-60"
         />
-        {error && <div className="text-red text-sm mb-3 -mt-1">{error}</div>}
+        {error && <div className="text-red text-base mb-3 -mt-1">{error}</div>}
         <button
           disabled={!username || isLoading}
-          className="w-full sm:w-96 bg-yellow text-black py-3 px-4 hover:brightness-[110%] disabled:hover:brightness-100 disabled:opacity-60"
+          className="text-xl w-full sm:w-96 bg-yellow text-black py-3 px-4 hover:brightness-[110%] disabled:hover:brightness-100 disabled:opacity-60"
         >
           {buttonText}
         </button>

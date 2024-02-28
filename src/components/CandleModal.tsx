@@ -17,7 +17,7 @@ export default function CandleModal({ onClose }: { onClose: () => void }) {
   return (
     <>
       <div className="h-screen w-screen fixed bg-black opacity-70 z-50" onClick={onClose} />
-      <div className="text-center text-white z-50 fixed max-w-[650px] h-fit bg-grey px-8 py-6">
+      <div className="text-lg text-center text-white z-50 fixed max-w-[650px] h-fit bg-grey px-8 py-6">
         <div>Each candle will go out</div>
         <input
           value={hours}
@@ -47,13 +47,10 @@ export default function CandleModal({ onClose }: { onClose: () => void }) {
           You will need to relight any candles that are already lit for this new duration to take effect.
         </div>
         <div className="flex gap-4 text-base justify-center mt-8">
-          <button className="hover:text-yellow" onClick={onClose}>
+          <button className="hover:text-yellow text-lg" onClick={onClose}>
             Cancel
           </button>
-          <button
-            className="px-4 py-2 bg-blue text-white hover:brightness-125 disabled:opacity-60 disabled:hover:brightness-100"
-            onClick={handleSave}
-          >
+          <button className="btn bg-blue text-white" onClick={handleSave}>
             Save
           </button>
         </div>

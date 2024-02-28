@@ -61,7 +61,7 @@ export default function UserDroppable({
             isOver && "scale-125",
             currentUser!.isGm || isCurrentUser ? "cursor-pointer" : "cursor-default",
             isCurrentUser && "this-user",
-            "user text-yellow h-fit w-fit p-3 border-2 border-yellow bg-black"
+            "user text-xl text-yellow h-fit w-fit p-2.5 border-2 border-yellow bg-black"
           )}
           onClick={handleClick}
           onMouseEnter={() => {
@@ -79,22 +79,22 @@ export default function UserDroppable({
           <div className={clsx(characterCard && topCardInStack && "gap-4", "flex justify-center items-center z-50")}>
             {characterCard && (
               <div className={clsx(CARD_CLASSES, "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
-                <div className="text-lg">{CardType.Character}</div>
-                <div className="text-sm mt-3">{characterCard.content}</div>
+                <div className="text-xl">{CardType.Character}</div>
+                <div className="mt-3">{characterCard.content}</div>
               </div>
             )}
             {topCardInStack && (
               <div className={clsx(CARD_CLASSES, "!shadow-[0px_0px_40px_10px_rgba(0,0,0,0.4)]")}>
                 {topCardInStack.type === CardType.Brink && !topCardInStack.isRevealed ? (
-                  <div className="flex justify-center items-center text-center w-full h-full text-lg">
+                  <div className="flex justify-center items-center text-center w-full h-full text-xl">
                     {CardType.Brink}
                     <br />
                     (hidden)
                   </div>
                 ) : (
                   <>
-                    <div className="text-lg">{topCardInStack.type}</div>
-                    <div className="text-sm mt-3">{topCardInStack.content}</div>
+                    <div className="text-xl">{topCardInStack.type}</div>
+                    <div className="mt-3">{topCardInStack.content}</div>
                   </>
                 )}
               </div>

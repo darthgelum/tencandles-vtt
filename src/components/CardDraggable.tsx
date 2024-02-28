@@ -87,8 +87,8 @@ export default function CardDraggable({ card, areCardsLocked, isTopOfStack, onDe
           </button>
         </div>
       )}
-      <div className="text-lg">{title}</div>
-      <div className="mt-3 text-sm">{card.content}</div>
+      <div className="text-xl">{title}</div>
+      <div className="mt-3">{card.content}</div>
     </div>
   )
 }

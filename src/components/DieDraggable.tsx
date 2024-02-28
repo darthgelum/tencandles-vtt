@@ -59,7 +59,7 @@ export default function DieDraggable({
         isBeingDraggedBySomeoneElse && "opacity-60",
         isDragging ? "z-40" : "z-30",
         die.id === HOPE_DIE_ID && "die_hope",
-        "relative flex justify-center items-center border-3 text-3xl w-[64px] h-[64px] pb-0.5 pl-0.5 cursor-grab active:cursor-grabbing hover:brightness-125",
+        "relative flex justify-center items-center border-3 text-3xl w-[64px] h-[64px] pl-0.5 cursor-grab active:cursor-grabbing hover:brightness-125",
         moreClasses
       )}
       style={style}

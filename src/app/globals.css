@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "PixeloidSans";
-  src: url("../fonts/PixeloidSans-mLxMm.ttf");
-}
-
-@font-face {
-  font-family: "Verdana";
-  src: url("../fonts/verdana.ttf");
-}
-
 :root {
   color-scheme: only dark;
 }
@@ -22,7 +12,7 @@ html {
 }
 
 html {
-  @apply font-pixel text-[16px];
+  @apply text-[16px];
 }
 
 #root {
@@ -31,10 +21,6 @@ html {
 
 ul {
   @apply list-disc space-y-3 ml-4;
-}
-
-.btn {
-  @apply text-lg px-4 py-2 hover:brightness-125 disabled:opacity-60 disabled:hover:brightness-100;
 }
 
 ::-webkit-scrollbar {
