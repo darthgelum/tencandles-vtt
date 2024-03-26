@@ -125,7 +125,9 @@ export default function Room() {
         }
         return newState
       })
-      transferDieToNewPool(dieId, prevDicePool, newDicePool)
+      if (newDicePool && prevDicePool !== newDicePool) {
+        transferDieToNewPool(dieId, prevDicePool, newDicePool)
+      }
     })
 
     return () => {
@@ -156,18 +158,18 @@ export default function Room() {
   }
 
   function handleDieDragEnd(event: DragEndEvent) {
-    const newDicePool = event.over?.id
-    if (!newDicePool) return
-
     let prevDicePool = DicePool.Player
     if (dicePools[DicePool.GM].find((die) => die.id === event.active.id)) {
       prevDicePool = DicePool.GM
     } else if (dicePools[DicePool.Stash].find((die) => die.id === event.active.id)) {
       prevDicePool = DicePool.Stash
     }
-    if (prevDicePool === newDicePool) return
 
-    transferDieToNewPool(event.active.id, prevDicePool, newDicePool)
+    const newDicePool = event.over?.id
+
+    if (newDicePool && prevDicePool !== newDicePool) {
+      transferDieToNewPool(event.active.id, prevDicePool, newDicePool)
+    }
 
     socket.emit("dieDragEnd", { username: user!.name, room, dieId: event.active.id, prevDicePool, newDicePool })
   }
