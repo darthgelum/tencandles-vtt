@@ -12,6 +12,9 @@ export default function HelpModal({ onClose }: { onClose: () => void; onSwitchFo
           </button>
           <h2 className="text-center text-4xl mb-6">Useful Tips</h2>
           <div className="overflow-y-auto pr-2 font-sans text-lg">
+            <p className="mb-4 text-yellow text-base">
+              If something isn't working, please email me at robyn3choi@gmail.com.
+            </p>
             <h3 className="text-2xl pb-2 font-semibold">Room Setup</h3>
             <ul>
               <li>
