@@ -71,7 +71,7 @@ const OnboardingContext = createContext<OnboardingProviderValue | undefined>(und
 type OnboardingProviderValue = {
   currentOnboardingStage: OnboardingStage
   startOnboardingStage: (stage: OnboardingStage) => void
-  setIsOnboardingOpen: React.Dispatch<React.SetStateAction<Boolean>>
+  setIsOnboardingOpen: React.Dispatch<React.SetStateAction<boolean>>
   isOnboardingOpen: Boolean
   completedOnboardingStages: OnboardingStage[]
 }
