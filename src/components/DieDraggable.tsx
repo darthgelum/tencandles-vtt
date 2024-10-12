@@ -37,18 +37,26 @@ export default function DieDraggable({
 
   const delta = transform || peerDrag?.delta
   const style = delta ? { transform: `translate3d(${delta.x}px, ${delta.y}px, 0)` } : undefined
-
-  let colorClasses
+  let emoji: string = ""
+  let emojis = ['💀', '🎃']
+  let colorClasses: string
   if (die.id === HOPE_DIE_ID) {
-    colorClasses =
-      die.num >= 5 ? "text-darkgrey bg-lightblue border-lightblue" : "text-lightblue border-lightblue bg-darkgrey"
+    if (die.num >= 5) {
+      emoji = emojis[1];
+      colorClasses = "text-darkgrey bg-lightblue border-lightblue";
+    } else {
+      colorClasses = "text-lightblue border-lightblue bg-darkgrey";
+    }
   } else {
-    colorClasses =
-      die.num === 6
-        ? "text-darkgrey border-yellow bg-yellow"
-        : die.num === 1
-        ? "text-red border-red bg-darkgrey"
-        : "text-orange border-orange bg-darkgrey"
+    if (die.num === 6) {
+      colorClasses = "text-darkgrey border-yellow bg-yellow";
+      emoji = emojis[1];
+    } else if (die.num === 1) {
+      colorClasses = "text-red border-red bg-darkgrey";
+      emoji = emojis[0];
+    } else {
+      colorClasses = "text-orange border-orange bg-darkgrey";
+    }
   }
 
   return (
@@ -59,14 +67,14 @@ export default function DieDraggable({
         isBeingDraggedBySomeoneElse && "opacity-60",
         isDragging ? "z-40" : "z-30",
         die.id === HOPE_DIE_ID && "die_hope",
-        "relative flex justify-center items-center border-3 text-3xl w-[64px] h-[64px] pl-0.5 cursor-grab active:cursor-grabbing hover:brightness-125",
+        "text-uni relative flex justify-center items-center border-3 text-3xl w-[64px] h-[64px] pl-0.5 cursor-grab active:cursor-grabbing hover:brightness-125",
         moreClasses
       )}
       style={style}
       {...listeners}
       {...attributes}
     >
-      {die.num}
+      {emoji}
       {isBeingDraggedBySomeoneElse && (
         <div className="absolute top-[6px] left-[12px] text-white text-sm flex flex-col justify-center items-center w-8 z-50">
           <PiHandGrabbingFill className="w-8 h-8" />

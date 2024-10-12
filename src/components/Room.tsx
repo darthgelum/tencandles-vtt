@@ -14,11 +14,13 @@ import Lobby from "./Lobby"
 import UI from "./UI"
 import OnboardingStage from "enums/OnboardingStage"
 import { useOnboarding } from "context/OnboardingContext"
+import useSound from 'use-sound'
+import diceRollSound from '../../public/dice.mp3'
 
 export default function Room() {
   const { user, areCardsLocked, setAreCardsLocked } = useUser()
   const { room } = useParams()
-
+  const [sound] = useSound(diceRollSound)
   const [candles, setCandles] = useState<boolean[]>(Array(10).fill(false))
   const [dicePools, setDicePools] = useState<{ [key in DicePool]: Die[] }>({
     [DicePool.Player]: getInitialDice(),
@@ -102,6 +104,13 @@ export default function Room() {
     })
 
     socket.on("rolled", ({ dicePool, dice, username }) => {
+      const values = [1, 2, 3, 4, 5]
+
+      for (let i = 0; i < dice.length; i++) {
+        const randomIndex = Math.floor(Math.random() * values.length);
+        const offsetValue = values[randomIndex];
+        setTimeout(() => { sound() }, offsetValue * 100)
+      }
       setDicePools((prevState) => {
         const newState = { ...prevState }
         dice.forEach((d, i) => (newState[dicePool][i].num = d))

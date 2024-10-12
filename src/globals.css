@@ -8,6 +8,11 @@
 }
 
 @font-face {
+  font-family: "Unifontex";
+  src: url("../fonts/Unifontexmono.ttf");
+}
+
+@font-face {
   font-family: "Verdana";
   src: url("../fonts/verdana.ttf");
 }
@@ -59,4 +64,8 @@ ul {
 
 .reactour__close-button {
   @apply !top-[18px] !right-[18px];
+}
+.text-uni {
+  font-family: "Unifontex";
+  font-size: 2rem;
 }
