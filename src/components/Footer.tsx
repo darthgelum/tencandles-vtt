@@ -17,8 +17,8 @@ export default function Footer() {
         Created by{" "}
         <a className="underline hover:text-white" href="https://linktr.ee/bitbirdy" target="_blank" rel="noreferrer">
           Robyn Choi
-        </a>
-        and
+        </a>{" "}
+        and{" "}
         <a className="underline hover:text-white" href="https://github.com/darthgelum" target="_blank" rel="noreferrer">Philipp Dmitrov</a>
         .
       </p>
